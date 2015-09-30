@@ -42,7 +42,7 @@
    }
    
    this.add_class = '.add-to-cart';
-   this.buy_class = 'buy-it-now';
+   this.buy_class = '.buy-it-now';
    
    $(this.add_class).bind("click",function(e){
       
@@ -117,7 +117,18 @@
         }
    }
    
-   this.cartItems.push(JSON.stringify(data));
+   if(data.length > 1) {
+      
+      var current_items = get();
+      
+          current_items.push(data);
+          
+      this.cartItems = current_items ;
+      
+   } else {
+      
+      this.cartItems.push(JSON.stringify(data));
+   }
    
    this.storage.setItem("cart_items",JSON.stringify(this.cartItems));
     
