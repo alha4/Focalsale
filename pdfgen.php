@@ -177,8 +177,15 @@ $pdf->SetTextColor(0,0,0);
 $pdf->Ln();
 $pdf->Cell($colspan,7, "www.focalsale.com", 1, 0, 'L', 1); 
 
+$tid = (substr(time(),0,4));
+
+$pdf->Output($_SERVER['DOCUMENT_ROOT'].'/cart/invoice/doc'.$tid.'.pdf', 'F');
+
+$_SESSION['did']  = $tid;
+
 $pdf->Output('doc.pdf', 'I');
 
+require_once "send_invoice.php";
 }
 
 }
