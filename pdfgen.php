@@ -1,6 +1,9 @@
 <?
 require_once('tcpdf/tcpdf.php');
 require_once $_SERVER['DOCUMENT_ROOT']."/export.php";
+require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
+
+CModule::IncludeModule("file");
 
 class Report {
 
@@ -177,13 +180,19 @@ $pdf->SetTextColor(0,0,0);
 $pdf->Ln();
 $pdf->Cell($colspan,7, "www.focalsale.com", 1, 0, 'L', 1); 
 
-$tid = (substr(time(),0,4));
+$tid = substr(time(),0,5);
 
-$pdf->Output($_SERVER['DOCUMENT_ROOT'].'/cart/invoice/doc'.$tid.'.pdf', 'F');
+$pdf->Output($_SERVER['DOCUMENT_ROOT'].'/cart/invoice/doc'.$tid.'.pdf',"F");
 
-$_SESSION['did']  = $tid;
+$arrFile = CFile::MakeFileArray( $_SERVER['DOCUMENT_ROOT'].'/cart/invoice/doc'.$tid.'.pdf');
 
-$pdf->Output('doc.pdf', 'I');
+$fid = CFile::SaveFile($arrFile);
+
+$_SESSION['did']  = $fid;
+
+print_r($_SESSION['did']);
+
+//$pdf->Output('doc.pdf', 'I');
 
 require_once "send_invoice.php";
 }
