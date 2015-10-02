@@ -5,6 +5,8 @@ require($_SERVER["DOCUMENT_ROOT"]."/cart/order_status.php");
 $APPLICATION->SetPageProperty("not_show_nav_chain", "Y");
 $APPLICATION->SetTitle(" ");
 
+CModule::IncludeModule("event");
+
 /*ini_set("display_errors",1);
 error_reporting(E_ALL);*/
 
