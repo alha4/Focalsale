@@ -1,8 +1,6 @@
+(function() {
 
-    
- //https://github.com/alha4/market.git
- 
- function JCart() {
+  var JCart = function() {
     
     this.storage = this.storageAdapter();
     
@@ -10,14 +8,8 @@
     
     var storage_hash  = 'cart_items',
     
-        _jcart = this,
+        _jcart = this;
       
-        get = function() {
-       
-           return JSON.parse( _jcart.storage.getItem('cart_items') );
-         
-       }
-    
     var in_cart = function(needle) { 
 
      var strict = true;
@@ -43,6 +35,13 @@
    
    this.add_class = '.add-to-cart';
    this.buy_class = '.buy-it-now';
+   this.remove_cart_item = '.remove-cart-item';
+   
+   $(this.remove_cart_item).bind("click",function(e){
+      
+      _jcart.remove( String($(e.target).attr("data-cart")) );
+      
+   });
    
    $(this.add_class).bind("click",function(e){
       
@@ -89,6 +88,12 @@
 
   },
   
+  get : function() {
+       
+      return JSON.parse( _jcart.storage.getItem('cart_items') );
+         
+  },
+  
   addToCart : function(data) {
 
     var required_params = ["item_id", "item_name","price","shipping_cost","picture","currency"],
@@ -123,7 +128,7 @@
       
           current_items.push(data);
           
-      this.cartItems = current_items ;
+      this.cartItems = current_items;
       
    } else {
       
@@ -132,5 +137,41 @@
    
    this.storage.setItem("cart_items",JSON.stringify(this.cartItems));
     
+  },
+  
+  remove : function(item) {
+   
+     var current_items = get();
+      
+         item =  JSON.parse(item);
+         
+     var item_id = item.item_id,
+         new_items = [];
+     
+     for(var k in current_items) {
+      
+         var current_item = JSON.parse(current_items[k]);
+         
+         if(current_item.item_id !== item_id) {
+            
+            new_items.push(current_item);
+            //code
+         }
+      
+     }
+     
+     this.storage.setItem("cart_items",JSON.stringify(new_items) );
+     console.log( get() );
+  },
+  
+  clear : function() {
+      
+    this.storage.removeItem("cart_items");
+    this.storage.clear();
+    
   }
- };
+ }
+ 
+ (new JCart()).init();
+ 
+})();
