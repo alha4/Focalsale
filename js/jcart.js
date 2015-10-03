@@ -1,6 +1,6 @@
-(function(global,$) {
-  console.log($);
-  global.$ = $;
+var Jcart = (function(JQ) {
+  
+  $ = JQ;
   
   function JCart() {
     
@@ -169,7 +169,7 @@
  }
   var jcart = new JCart();
   
-  global.JCart =  {
-       get : jcart.get 
+  return  {
+       get : function() { jcart.get } 
   }
-})(window,$); 
+})(jQuery); 
