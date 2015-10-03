@@ -1,10 +1,9 @@
-(function() {
-
-  var JCart = function() {
+  
+  function JCart() {
     
     this.storage = this.storageAdapter();
     
-    this.cartItems = [];
+    this.cartItems = {items : []};
     
     var storage_hash  = 'cart_items',
     
@@ -18,12 +17,18 @@
      
      needle = needle.item_id;
      
-     var items = get();
+     var storage_items = _jcart.get();
      
-     for(var key in items) {
+     if(!storage_items) {
+      
+         return false;
+     }
+      
+     for(var key in storage_items) {
 
-       var haystack = JSON.parse(items[key]);
+       var haystack = storage_items[key];
        
+         //console.log( typeof (haystack) );  
          if( (strict && (haystack).item_id === needle) || (!strict && (haystack).item_id == needle) ){
 
             return key;
@@ -90,7 +95,9 @@
   
   get : function() {
        
-      return JSON.parse( _jcart.storage.getItem('cart_items') );
+      var storageToObj = JSON.parse( this.storage.getItem('cart_items') );
+      
+      return (storageToObj === null) ? false : storageToObj.items;
          
   },
   
@@ -124,24 +131,24 @@
    
    if(data.length > 1) {
       
-      var current_items = get();
+      var current_items = this.get();
       
           current_items.push(data);
           
-      this.cartItems = current_items;
+      this.cartItems.items = current_items;
       
    } else {
       
-      this.cartItems.push(JSON.stringify(data));
+      this.cartItems.items.push( data );
    }
+   //console.log( ( this.cartItems) );
    
    this.storage.setItem("cart_items",JSON.stringify(this.cartItems));
-    
+   
   },
-  
   remove : function(item) {
    
-     var current_items = get();
+     var current_items = this.get();
       
          item =  JSON.parse(item);
          
@@ -160,8 +167,10 @@
       
      }
      
-     this.storage.setItem("cart_items",JSON.stringify(new_items) );
-     console.log( get() );
+     this.cartItems.items = new_items;
+     
+     this.storage.setItem("cart_items",JSON.stringify(this.cartItems) );
+     //console.log( this.get() );
   },
   
   clear : function() {
@@ -172,6 +181,4 @@
   }
  }
  
- (new JCart()).init();
  
-})();
