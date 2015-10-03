@@ -96,8 +96,6 @@ class PaypalIpn {
  
          $this->service->processPayment($myPost);
 
-         return true;
-
       } 
       else if(strcmp($verified_responce, "INVALID") == 0) {
 
@@ -175,7 +173,3 @@ class PaypalIpn {
      
    }
 }   
-/*
-$ipn = new PaypalIpn();
-$ipn->createIpnListener();*/
-?>

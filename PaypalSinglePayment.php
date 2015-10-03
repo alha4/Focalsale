@@ -2,8 +2,10 @@
 
 class PaypalSinglePayment {
  
-  const ERROR_TRANSACTION  = 'Ошибка проведения транзикции';
-  const ERROR_ORDER_CREATE = 'Ошибка создания заказа';
+  const ERROR_TRANSACTION    = 'Ошибка проведения транзикции';
+  const ERROR_ORDER_CREATE   = 'Ошибка создания заказа';
+  const ERROR_USER_NOT_FOUND = 'Ошибка не найдена учётная запись о пользователе';
+  const ERROR_UPDATE_USER    = 'Ошибка обновления данных пользователя';
 
   function processPayment($post) {
 
@@ -30,25 +32,31 @@ class PaypalSinglePayment {
       $this->saveUserOrderID($post['txn_id'],$user_id,$order_id);
       $this->saveTransaction($fields);
 
+      return true;
+
     }
     catch(Exception $e) {
 
       $this->errorLogTransaction( $e->getMessage() );
+
+      return false;
   
     } 
   }
 
   private function parsePost($post) {
 
-   $products = array();
+    $products = array();
 
     foreach($post as $key=>$value) { 
-
+     
       if( preg_match("/item_number(\d)/i",$key,$match)  ) {
-
-          $q = (int)trim($post['quantity'.$match[1] ]);
-         
-          $products[] = array("model_code"=>urldecode($value),"quantity"=>$q);
+        
+          $quantity = (int)trim($post['quantity'.$match[1] ]); /* find quantity post value */
+          
+          $products[] = array("model_code"=> urldecode($value),
+                              "quantity"  => $quantity
+                        );
       }
     }
 
@@ -95,7 +103,13 @@ class PaypalSinglePayment {
 
          $arUser = $rsUser->Fetch();
 
-         $fileds_order_id =   $arUser['UF_ORDER_ID'];
+         if($arUser['ID'] != $user_id) {
+      
+            throw new Exception(PaypalSinglePayment::ERROR_USER_NOT_FOUND);
+           
+         }
+
+         $fileds_order_id   = $arUser['UF_ORDER_ID'];
 
          $fileds_order_date = $arUser['UF_DATE_ORDER'];
 
@@ -111,7 +125,7 @@ class PaypalSinglePayment {
     
          if(is_array($fileds_order_date)) {
 
-            array_push($fileds_order_date, date("d.m.Y H:i:s") );
+            array_push($fileds_order_date, date("d.m.Y H:i:s"));
 
          } else {
 
@@ -126,34 +140,18 @@ class PaypalSinglePayment {
        
          ); 
 
-         $USER->Update($user_id, $fields);
+         if( $USER->Update($user_id, $fields) === false ) {
+
+             throw new Exception( PaypalSinglePayment::ERROR_UPDATE_USER.' '.$USER->LAST_ERROR );
+         }
+
       } 
 
       return $responce['order']['order_id'];
 
     } else {
   
-     $res = '';
-
-     foreach($responce as $k=>$val) {
-
-       if(is_array($val)) {
-
-          foreach($val as $i=>$v) {
- 
-             $res.= $i.'='.$v.' ';
-
-          }
-     
-       } else {
-          $res.= $k.'='.$val.' ';
-       }
-
-     }
-
-     throw new Exception(PaypalSinglePayment::ERROR_ORDER_CREATE.' '.$res);
-
-     return false;
+      throw new Exception(PaypalSinglePayment::ERROR_ORDER_CREATE.' '.json_encode($responce));
 
    }
 
@@ -198,11 +196,11 @@ class PaypalSinglePayment {
 
   private function errorLogTransaction($data_log) {
 
-     $f = fopen("log_error.txt","a+");
+    $f = fopen("log_error.txt","a+");
 
-     fwrite($f,$data_log);
+    fwrite($f,$data_log);
 
-     fclose($f);
+    fclose($f);
   }
 
   private function postLog($data_text) {
