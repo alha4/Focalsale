@@ -6,8 +6,41 @@ class PaypalSinglePayment {
   const ERROR_ORDER_CREATE = 'Ошибка создания заказа';
 
   function processPayment($post) {
-   
-    $product = array();
+
+    $custom_vars = explode('#',$post['custom']);
+
+    $user_id = $custom_vars[1];
+
+    $data_request = $this->parsePost($post);
+
+    try {
+
+      $order_id = $this->createOrder($data_request,$user_id);
+
+      $fields = array(
+
+             "txn_id"=>      $post['txn_id'],
+             "ipn_track_id"=>$post['ipn_track_id'],
+             "payer_email" =>$post['receiver_email'],
+             "user_id" =>    $user_id,
+             "payment_status" => $post['payment_status'],
+             "txn_date" =>   date("d.m.Y H:i:s")
+      );
+
+      $this->saveUserOrderID($post['txn_id'],$user_id,$order_id);
+      $this->saveTransaction($fields);
+
+    }
+    catch(Exception $e) {
+
+      $this->errorLogTransaction( $e->getMessage() );
+  
+    } 
+  }
+
+  private function parsePost($post) {
+
+   $products = array();
 
     foreach($post as $key=>$value) { 
 
@@ -15,7 +48,7 @@ class PaypalSinglePayment {
 
           $q = (int)trim($post['quantity'.$match[1] ]);
          
-          $product[] = array("model_code"=>urldecode($value),"quantity"=>$q);
+          $products[] = array("model_code"=>urldecode($value),"quantity"=>$q);
       }
     }
 
@@ -28,9 +61,9 @@ class PaypalSinglePayment {
       "payment_method" => "PayPal",
       "shipping" => "$custom_vars[2]",
       "currency" =>  $post["mc_currency"],
-      "products" =>  $product,
+      "products" =>  $products,
       "address" => array(
-         "tax_id" => $post["txn_id"],
+         "tax_id" =>     $post["txn_id"],
          "first_name" => $fio[0],
          "last_name" =>  $fio[1],
          "street" =>     urldecode($post["address_street"]),
@@ -38,49 +71,13 @@ class PaypalSinglePayment {
          "city" =>       urldecode($post['address_city']),
          "country" =>    $post['address_country_code'],
          "telephone" =>  $custom_vars[0],
-         "state" => $post['address_state'],
+         "state" =>      $post['address_state'],
          "country_iso2" => $post['address_country_code'],
          "socket" => "US"
        )
     );
 
-    $user_id = $custom_vars[1];
-
-    try {
-
-      $order_id = $this->createOrder($data_request,$user_id);
-
-    }
-    catch(Exception $e) {
-
-      $this->errorLogTransaction( $e->getMessage() );
-  
-    } finally {
-
-      //$this->postLog(  json_encode($data_request).' - '.$user_id.'#'.$order_id );
-
-   }
-
-   $fields = array(
-
-             "txn_id"=>      $post['txn_id'],
-             "ipn_track_id"=>$post['ipn_track_id'],
-             "payer_email" =>$post['receiver_email'],
-             "user_id" =>    $user_id,
-             "payment_status" => $post['payment_status'],
-             "txn_date" =>   date("d.m.Y H:i:s")
-   );
-
-   if($order_id) { 
-      
-      $this->saveUserOrderID($post['txn_id'],$user_id,$order_id);
-      $this->saveTransaction($fields);
-
-   } else {
-
-      $this->errorLogTransaction( json_encode($data_request) );
-
-    }
+    return $data_request;
 
   }
 
@@ -191,7 +188,7 @@ class PaypalSinglePayment {
 
     $arInsert = $DB->PrepareInsert("transactions",$data);
 
-    $strSql = "INSERT INTO transactions (".$arInsert[0].") VALUES (".$arInsert[1].")";
+    $strSql   = "INSERT INTO transactions (".$arInsert[0].") VALUES (".$arInsert[1].")";
 
     $DB->Query($strSql, false);
 
