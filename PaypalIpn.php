@@ -38,7 +38,7 @@ class PaypalIpn {
 
       if( count($raw_post_array) == 1) {
       
-          //return false;
+          return false;
        
       }
      
@@ -97,7 +97,8 @@ class PaypalIpn {
          $this->service->processPayment($myPost);
 
       } 
-      else if(strcmp($verified_responce, "INVALID") == 0) {
+
+      if(strcmp($verified_responce, "INVALID") == 0) {
 
          // запрос не прощел проверку
          $this->log((PaypalIpn::IPN_NOT_CONFIRM).':'.$ipn_query_string.':'.date("d, m, Y H:i:s")."\r\n");
@@ -106,7 +107,7 @@ class PaypalIpn {
 
       }
 
-      if($myPost["txn_type"] != "web_accept" || $myPost["receiver_email"] != PaypalIpn::BUSSINES_EMAIL) {
+      if($myPost["txn_type"] != "web_accept" || urldecode($myPost["receiver_email"]) != PaypalIpn::BUSSINES_EMAIL) {
 
          $this->log((PaypalIpn::IPN_ERROR_TRANSACTION).':'.$ipn_query_string.':'.date("d, m, Y H:i:s")."\r\n");
 
