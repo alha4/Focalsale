@@ -190,9 +190,7 @@ $fid = CFile::SaveFile($arrFile);
 
 $_SESSION['did']  = $fid;
 
-print_r($_SESSION['did']);
-
-//$pdf->Output('doc.pdf', 'I');
+$pdf->Output('doc.pdf', 'I');
 
 require_once "send_invoice.php";
 }

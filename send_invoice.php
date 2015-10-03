@@ -17,6 +17,5 @@ $arFile = $pdf_file->Fetch();
 
 CEvent::send($event_id,$site_id,$arFields,false,false,array($arFile['ID']));
 
-echo $arFile['ID'];
 ?>
 
