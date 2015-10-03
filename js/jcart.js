@@ -1,48 +1,63 @@
+(function(global,$) {
+  console.log($);
+  global.$ = $;
   
   function JCart() {
     
-    this.storage = this.storageAdapter();
-    
+    this.storage = window.sessionStorage || window.localStorage || { setItem : function(key,item) {
+
+                         $.cookie(key,item);
+
+                      },
+                      getItem : function(key) {
+
+                          return $.cookie(key);
+
+                      },
+                      clear : function(key) {
+ 
+                           $.cookie(key,null);
+                       }
+                    };    
+  
     this.cartItems = {items : []};
     
-    var storage_hash  = 'cart_items',
+    var storage_hash = 'cart_items',
     
-        _jcart = this;
+        _jcart  = this,
       
-    var in_cart = function(needle) { 
+        in_cart = function(needle) { 
 
-     var strict = true;
+          needle = JSON.parse(needle);
      
-     needle = JSON.parse(needle);
+          needle = needle.item_id;
      
-     needle = needle.item_id;
+          var storage_items = _jcart.get();
      
-     var storage_items = _jcart.get();
-     
-     if(!storage_items) {
+          if(!storage_items) {
       
-         return false;
-     }
+             return false;
+          }
       
-     for(var key in storage_items) {
+          for(var key in storage_items) {
 
-       var haystack = storage_items[key];
-       
-         //console.log( typeof (haystack) );  
-         if( (strict && (haystack).item_id === needle) || (!strict && (haystack).item_id == needle) ){
-
-            return key;
-
-         } 
-      }
-      return false; 
-   }
+            var haystack = storage_items[key];
+            //console.log( typeof (haystack) );  
+            if( haystack.item_id === needle ){
+               
+              return key;
+            
+            } 
+          }
+          
+          return false; 
+        }
    
-   this.add_class = '.add-to-cart';
-   this.buy_class = '.buy-it-now';
-   this.remove_cart_item = '.remove-cart-item';
+   this.add_class    = '.add-to-cart';
+   this.buy_class    = '.buy-it-now';
+   this.remove_class = '.remove-cart-item';
    
-   $(this.remove_cart_item).bind("click",function(e){
+   $(this.remove_class).bind("click",function(e){
       
       _jcart.remove( String($(e.target).attr("data-cart")) );
       
@@ -51,48 +66,20 @@
    $(this.add_class).bind("click",function(e){
       
     if( !in_cart( $(e.target).attr("data-cart") ) ) { 
-      _jcart.addToCart( String($(e.target).attr("data-cart")) );
+        _jcart.addToCart( String($(e.target).attr("data-cart")) );
     } else {
       alert("item in basket");
-    }
-      
-      //alert(2);
-   });
-   
+   }   
     
+  });
+     
  }
  
  JCart.prototype = {
-
-  storageAdapter : function() {
-
-  var  storage = window.sessionStorage || window.localStorage || null;
-
-  if( storage === null ) {
- 
-      
-      storage = { setItem : function(key,item) {
-
-                    $.cookie(key,item);
-
-                 },
-                 getItem : function(key) {
-
-                   return $.cookie(key);
-
-                 },
-                 clear : function(key) {
- 
-                   $.cookie(key,null);
-                        
-                  }
-               };    
-  }
-  
-  return storage;
-
+   
+  init : function() {
+   
   },
-  
   get : function() {
        
       var storageToObj = JSON.parse( this.storage.getItem('cart_items') );
@@ -157,7 +144,7 @@
      
      for(var k in current_items) {
       
-         var current_item = JSON.parse(current_items[k]);
+         var current_item = current_items[k];
          
          if(current_item.item_id !== item_id) {
             
@@ -180,5 +167,9 @@
     
   }
  }
- 
- 
+  var jcart = new JCart();
+  
+  global.JCart =  {
+       get : jcart.get 
+  }
+})(window,$); 
