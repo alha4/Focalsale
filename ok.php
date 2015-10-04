@@ -27,16 +27,14 @@ if($order_id) :
 <?
  if($is_register_user) :
 ?>
-
+<div class="pay-done">
 <p>To trace the history of your orders you can in your profile <a href="/profile/">My profile</a></p>
-
-<p>Get invoice on the link <a href="<?=$APPLICATION->GetCurDir()?>pdfgen.php?report_blank=<?=$order_id ?>" target="blank">invoice PDF</a></p>
-
+<p>Your invoice will be automatically sent to you by email <br>  click the link <a href="<?=$APPLICATION->GetCurDir()?>pdfgen.php?report_blank=<?=$order_id ?>" target="blank">invoice PDF</a></p>
+</div>
 <? else : ?>
-
-<p>Get invoice on the link <a href="<?=$APPLICATION->GetCurDir()?>pdfgen.php?report_blank=<?=$order_id ?>" target="blank">invoice PDF</a></p>
-
-
+<div class="pay-done">
+<p>Your invoice will be automatically sent to you by email <br>  click the link <a href="<?=$APPLICATION->GetCurDir()?>pdfgen.php?report_blank=<?=$order_id ?>" target="blank">invoice PDF</a></p>
+</div>
 <? 
  endif;
 ?>

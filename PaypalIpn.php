@@ -109,7 +109,7 @@ class PaypalIpn {
 
       }
 
-      if($myPost["txn_type"] != "web_accept" || urldecode($myPost["receiver_email"]) != PaypalIpn::BUSSINES_EMAIL) {
+      if($myPost["txn_type"] != "cart" || urldecode($myPost["receiver_email"]) != PaypalIpn::BUSSINES_EMAIL) {
 
          $this->log((PaypalIpn::IPN_ERROR_TRANSACTION).':'.$ipn_query_string.':'.date("d, m, Y H:i:s")."\r\n");
 
