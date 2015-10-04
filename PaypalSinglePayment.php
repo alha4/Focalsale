@@ -100,7 +100,7 @@ class PaypalSinglePayment {
 
   private function createOrder($data_request,$user_id) {
 
-    $responce = getRequestChinavasion('createOrder', $data_request,true);
+    $responce = getRequestChinavasion('createOrder', $data_request);
 
     if(is_numeric($responce['order']['order_id'])) {
 
@@ -183,6 +183,8 @@ class PaypalSinglePayment {
     $strSql = "INSERT INTO user_orders (".$arInsert[0].") VALUES (".$arInsert[1].")";
 
     $this->transaction_service->Query($strSql, false);
+   
+    $_SESSION['buyler_email'] = $buyler_email;
 
     return intval($this->transaction_service->LastID());
 
