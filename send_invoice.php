@@ -1,23 +1,30 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
 
-CModule::IncludeModule("event");
-CModule::IncludeModule("file");
+  CModule::IncludeModule("event");
+  CModule::IncludeModule("file");
 
-$doc_id = $_SESSION['did'];
+  global $DB;
+   
+  $id = $_SESSION['ord'];
 
-$event_id = 'SEND_PDF_INVOICE';
-$site_id = 's1';
+  $SQL= "SELECT buyler_email FROM user_orders WHERE order_id=".$id;
 
-$arFields = array("EMAIL_TO"=>"a.i.n.1989@mail.ru");
+  $db_result = $DB->Query( $SQL );
 
-$pdf_file = CFile::GetByID( $doc_id );
+  $rows  = $db_result->Fetch();
 
-$arFile = $pdf_file->Fetch();
+  $email_to =  $rows['buyler_email'];
 
-CEvent::send($event_id,$site_id,$arFields,false,false,array($arFile['ID']));
+  $doc_id = $_SESSION['did'];
 
-/* comment test */
+  $event_id = 'SEND_PDF_INVOICE';
+  $site_id = 's1';
 
-?>
+  $arFields = array("EMAIL_TO"=>"a.i.n.1989@mail.ru");
 
+  $pdf_file = CFile::GetByID( $doc_id );
+
+  $arFile = $pdf_file->Fetch();
+
+  CEvent::send($event_id,$site_id,$arFields,false,false,array($arFile['ID']));

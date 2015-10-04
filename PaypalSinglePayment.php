@@ -7,6 +7,15 @@ class PaypalSinglePayment {
   const ERROR_USER_NOT_FOUND = 'Ошибка не найдена учётная запись о пользователе';
   const ERROR_UPDATE_USER    = 'Ошибка обновления данных пользователя';
 
+  private $transaction_service;
+
+
+  function __construct($service_transaction) {
+
+     $this->transaction_service = $service_transaction;
+
+  }
+
   function processPayment($post) {
 
     $custom_vars = explode('#',$post['custom']);
@@ -24,12 +33,13 @@ class PaypalSinglePayment {
              "txn_id"=>      $post['txn_id'],
              "ipn_track_id"=>$post['ipn_track_id'],
              "payer_email" =>$post['receiver_email'],
+             "buyler_email"=>$post['payer_email'],
              "user_id" =>    $user_id,
              "payment_status" => $post['payment_status'],
              "txn_date" =>   date("d.m.Y H:i:s")
       );
 
-      $this->saveUserOrderID($post['txn_id'],$user_id,$order_id);
+      $this->saveUserOrderID($post['txn_id'],$user_id,$order_id,$post['payer_email']);
       $this->saveTransaction($fields);
 
       return true;
@@ -80,8 +90,7 @@ class PaypalSinglePayment {
          "country" =>    $post['address_country_code'],
          "telephone" =>  $custom_vars[0],
          "state" =>      $post['address_state'],
-         "country_iso2" => $post['address_country_code'],
-         "socket" => "US"
+         "country_iso2" => $post['address_country_code']
        )
     );
 
@@ -91,7 +100,7 @@ class PaypalSinglePayment {
 
   private function createOrder($data_request,$user_id) {
 
-    $responce = getRequestChinavasion('createOrder', $data_request);
+    $responce = getRequestChinavasion('createOrder', $data_request,true);
 
     if(is_numeric($responce['order']['order_id'])) {
 
@@ -129,7 +138,7 @@ class PaypalSinglePayment {
 
          } else {
 
-            $fileds_order_date = array( date("d.m.Y H:i:s"));
+            $fileds_order_date = array(date("d.m.Y H:i:s"));
 
          }
 
@@ -157,40 +166,37 @@ class PaypalSinglePayment {
 
   }
 
-  private function saveUserOrderID($txn_id,$user_id,$order_id) {
-
-    global $DB;
+  private function saveUserOrderID($txn_id,$user_id,$order_id,$buyler_email) {
 
     $data = array(
 
             "txn_id" =>  $txn_id,
             "user_id"=>  $user_id, 
             "order_id"=> $order_id,
-            "date_create" => date("d.m.Y H:i:s")
+            "buyler_email" => $buyler_email,
+            "date_create"  => date("d.m.Y H:i:s")
 
           );
 
-    $arInsert = $DB->PrepareInsert("user_orders",$data);
+    $arInsert = $this->transaction_service->PrepareInsert("user_orders",$data);
 
     $strSql = "INSERT INTO user_orders (".$arInsert[0].") VALUES (".$arInsert[1].")";
 
-    $DB->Query($strSql, false);
+    $this->transaction_service->Query($strSql, false);
 
-    return intval($DB->LastID());
+    return intval($this->transaction_service->LastID());
 
   }
 
   private function saveTransaction($data) {
 
-    global $DB;
-
-    $arInsert = $DB->PrepareInsert("transactions",$data);
+    $arInsert = $this->transaction_service->PrepareInsert("transactions",$data);
 
     $strSql   = "INSERT INTO transactions (".$arInsert[0].") VALUES (".$arInsert[1].")";
 
-    $DB->Query($strSql, false);
+    $this->transaction_service->Query($strSql, false);
 
-    return intval($DB->LastID());
+    return intval($this->transaction_service->LastID());
 
   }
 

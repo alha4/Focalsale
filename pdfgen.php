@@ -2,11 +2,11 @@
 require_once('tcpdf/tcpdf.php');
 require_once $_SERVER['DOCUMENT_ROOT']."/export.php";
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
-
+/*ini_set("display_errors",1);
+error_reporting(E_ALL);*/
 CModule::IncludeModule("file");
 
 class Report {
-
 
   private function parseData($ordID) {
 
@@ -47,7 +47,6 @@ class Report {
 
        $addres = $order['address'];
 
-
      
        $dataPeport['client'] = array(
                   'name'=>$addres['first_name'],
@@ -74,50 +73,50 @@ class Report {
     $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
 
 
-$pdf->SetCreator("focalsale.com");
-$pdf->SetAuthor('focalsale.com');
-$pdf->SetTitle('Invoice');
-$pdf->SetSubject('Invoice orders');
+    $pdf->SetCreator("focalsale.com");
+    $pdf->SetAuthor('focalsale.com');
+    $pdf->SetTitle('Invoice');
+    $pdf->SetSubject('Invoice orders');
 
 
-$pdf->setSpacesRE("\r");
-$pdf->SetMargins(5,10,5); // устанавливаем отступы (20 мм - слева, 25 мм - сверху, 25 мм - справа)
-$pdf->AddPage();
+    $pdf->setSpacesRE("\r");
+    $pdf->SetMargins(5,10,5); // устанавливаем отступы (20 мм - слева, 25 мм - сверху, 25 мм - справа)
+    $pdf->AddPage();
 
 
-$pdf->SetFillColor(255, 0, 0);
-$pdf->SetTextColor(255);
-$pdf->SetDrawColor(128, 0, 0);
-$pdf->SetLineWidth(0.3);
+    $pdf->SetFillColor(255, 0, 0);
+    $pdf->SetTextColor(255);
+    $pdf->SetDrawColor(128, 0, 0);
+    $pdf->SetLineWidth(0.3);
 
 
-$header = array('ORDER ID','Product','Quantity','Price','Shipping price');
+    $header = array('ORDER ID','Product','Quantity','Price','Shipping price');
 
-$num_headers = count($header);
+    $num_headers = count($header);
 
-$cell_w = 40;
+    $cell_w = 40;
 
-$colspan = ($cell_w * $num_headers) - $cell_w;
+    $colspan = ($cell_w * $num_headers) - $cell_w;
 
-$w = array(25,100,20,15,35);
+    $w = array(25,100,20,15,35);
   
-for($i = 0; $i < $num_headers; ++$i) {
+    for($i = 0; $i < $num_headers; ++$i) {
 
-    $pdf->Cell($w[$i], 7, $header[$i], 1, 0, 'C', 1);
-}
+         $pdf->Cell($w[$i], 7, $header[$i], 1, 0, 'C', 1);
+    }
 
 
-$pdf->Ln();
+    $pdf->Ln();
 
-$pdf->SetFillColor(255, 255, 255);
-$pdf->SetTextColor(0,0,0);
+    $pdf->SetFillColor(255, 255, 255);
+    $pdf->SetTextColor(0,0,0);
 
-$summ = 0.0;
-$ship = 0.0;
+    $summ = 0.0;
+    $ship = 0.0;
 
-$pos_x = array(0,25,125,155,170);
+    $pos_x = array(0,25,125,155,170);
 
-for($i = 0; $i < count($data); $i++) {
+    for($i = 0; $i < count($data); $i++) {
 
     $cells = $data[$i];
     $j = 0;
@@ -133,67 +132,68 @@ for($i = 0; $i < count($data); $i++) {
         $pdf->MultiCell($w[$j],0,$text,1,'C', 1, 0, '', '', false, 0, false, true, 0);
         $j+=1;
    
-   }
-   $pdf->Ln();
-}
+    }
 
-$pdf->Ln();
-$pdf->Cell($colspan, 7, 'Shipping: $'.$ship, 1, 0, 'L', 1);
-$pdf->Ln();
-$pdf->Cell($colspan, 7, 'Total: $'.$summ, 1, 0, 'L', 1);
-$pdf->Ln();
-$pdf->Cell($colspan, 7, 'Date: '.date("d.m.Y H:i"), 1, 0, 'L', 1);
-$pdf->Ln();
-$pdf->SetFillColor(255, 0, 0);
-$pdf->SetTextColor(255);
-$pdf->SetDrawColor(128, 0, 0);
+    $pdf->Ln();
+  }
 
-$pdf->Cell($colspan,7,"Buyer", 1, 0, 'L', 1); 
-$pdf->Ln();
+  $pdf->Ln();
+  $pdf->Cell($colspan, 7, 'Shipping: $'.$ship, 1, 0, 'L', 1);
+  $pdf->Ln();
+  $pdf->Cell($colspan, 7, 'Total: $'.$summ, 1, 0, 'L', 1);
+  $pdf->Ln();
+  $pdf->Cell($colspan, 7, 'Date: '.date("d.m.Y H:i"), 1, 0, 'L', 1);
+  $pdf->Ln();
+  $pdf->SetFillColor(255, 0, 0);
+  $pdf->SetTextColor(255);
+  $pdf->SetDrawColor(128, 0, 0);
 
-$j=0;
+  $pdf->Cell($colspan,7,"Buyer", 1, 0, 'L', 1); 
+  $pdf->Ln();
 
+  $j=0;
+  $pdf->SetFillColor(255, 255, 255);
+  $pdf->SetTextColor(0,0,0);
 
-$pdf->SetFillColor(255, 255, 255);
-$pdf->SetTextColor(0,0,0);
-foreach($client_data as $k=>$val) {
+  foreach($client_data as $k=>$val) {
 
+    $text = $val;
 
-        $text = $val;
+    $pdf->Cell($colspan,7, $k.' : '.$text, 1, 0, 'L', 1); 
 
-        $pdf->Cell($colspan,7, $k.' : '.$text, 1, 0, 'L', 1); 
+    $j+=1;
 
-        $j+=1;
-
-        $pdf->Ln();
+    $pdf->Ln();
     
-}
+  }
 
-$pdf->SetFillColor(255, 0, 0);
-$pdf->SetTextColor(255);
-$pdf->SetDrawColor(128, 0, 0);
-$pdf->Ln();
+  $pdf->SetFillColor(255, 0, 0);
+  $pdf->SetTextColor(255);
+  $pdf->SetDrawColor(128, 0, 0);
+  $pdf->Ln();
 
-$pdf->Cell($colspan,7, 'Shop', 1, 0, 'L', 1); 
-$pdf->SetFillColor(255, 255, 255);
-$pdf->SetTextColor(0,0,0);
-$pdf->Ln();
-$pdf->Cell($colspan,7, "www.focalsale.com", 1, 0, 'L', 1); 
+  $pdf->Cell($colspan,7, 'Shop', 1, 0, 'L', 1); 
+  $pdf->SetFillColor(255, 255, 255);
+  $pdf->SetTextColor(0,0,0);
+  $pdf->Ln();
+  $pdf->Cell($colspan,7, "www.focalsale.com", 1, 0, 'L', 1); 
 
-$tid = substr(time(),0,5);
+  $tid = substr(time(),0,5);
 
-$pdf->Output($_SERVER['DOCUMENT_ROOT'].'/cart/invoice/doc'.$tid.'.pdf',"F");
+  $pdf->Output($_SERVER['DOCUMENT_ROOT'].'/cart/invoice/doc'.$tid.'.pdf',"F");
 
-$arrFile = CFile::MakeFileArray( $_SERVER['DOCUMENT_ROOT'].'/cart/invoice/doc'.$tid.'.pdf');
+  $arrFile = CFile::MakeFileArray( $_SERVER['DOCUMENT_ROOT'].'/cart/invoice/doc'.$tid.'.pdf');
 
-$fid = CFile::SaveFile($arrFile);
+  $fid = CFile::SaveFile($arrFile);
 
-$_SESSION['did']  = $fid;
+  $_SESSION['did']  = $fid;
+  $_SESSION['ord']  = $order_id;
 
-$pdf->Output('doc.pdf', 'I');
+  $pdf->Output('doc.pdf', 'I');
 
-require_once "send_invoice.php";
-}
+  require_once "send_invoice.php";
+
+ }
 
 }
 

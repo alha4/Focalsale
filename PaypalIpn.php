@@ -16,7 +16,7 @@ class PaypalIpn {
 
     const IPN_ERROR_TRANSACTION = 'Не верный тип транзикции';
   
-    const LIVE = 'https://www.paypal.com/cgi-bin/websc';
+    const LIVE    = 'https://www.paypal.com/cgi-bin/websc';
 
     const SANDBOX = 'https://www.sandbox.paypal.com/cgi-bin/websc';
 
@@ -24,7 +24,9 @@ class PaypalIpn {
 
     public function __construct($config_url) {
 
-       $this->service = new PaypalSinglePayment();
+       global $DB;
+
+       $this->service = new PaypalSinglePayment($DB);
 
        $this->paypal_url = $config_url;
   
