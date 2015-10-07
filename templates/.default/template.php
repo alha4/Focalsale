@@ -1,15 +1,18 @@
 <?
- $APPLICATION->AddChainItem($product_list[0]['category_name'],"/list.php?sect=".rawurlencode($arResult[0]['category_name'])."¤cy=".$currenname );
+ $APPLICATION->AddChainItem($arResult[0]['category_name'],"{$arResult[path]}?sect=".rawurlencode($arResult[0]['category_name'])."currency=".$arResult['currency_value']);
 
  if($arResult[0]['category_name'] != $_GET['sect']) 
 
-     $APPLICATION->AddChainItem($arResult[0]['subcategory_name'],"/list.php?sect=".rawurlencode($_GET['sect'])."¤c=".$currenname); 
+     $APPLICATION->AddChainItem($arResult[0]['subcategory_name'],"{$arResult[path]}?sect=".rawurlencode($_GET['sect'])."currency=".$arResult['currency_value']); 
 
 ?>
-
+<? if($arResult) : ?>
+<?
+  print_r($arResult['on_page']);
+?>
 <div class="catalog-list">
 <?
-foreach($arResult as $item) :
+foreach($arResult['products'] as $item) :
 ?>
 <div class="cat-item">
 <?if( isset($item['special']) && is_array($item['special'])  ) : ?>
@@ -38,9 +41,9 @@ endforeach;
 ?>
 </div>
 <?
- $elements_on_page = 16;
- $total_products = $arResult['pagination'];
- $total_pages = ceil($total_products / $elements_on_page);
+ $elements_on_page = $arResult['on_page'];
+ $total_products   = $arResult['pagination'];
+ $total_pages      = ceil($total_products / $elements_on_page);
 ?>
 <?
 if( $total_products > $elements_on_page) :
@@ -49,10 +52,11 @@ if( $total_products > $elements_on_page) :
 <div class="pages">
 <?
  for($i = 0 ; $i <= $total_pages; $i++) {
-   echo '<a href="/list.php?sect=',rawurlencode($_GET['sect']),"&amp;page=",($i),'"', ($_GET['page'] == $i ? ' class="curr-page"' : '')  ,'>',$i + 1,'</a> ';
+   echo '<a href="',$arResult['path'],'?sect=',rawurlencode($_GET['sect']),"&amp;page=",($i),'"', ($_GET['page'] == $i ? ' class="curr-page"' : '')  ,'>',$i + 1,'</a> ';
  }
 ?>
 </div>
 <?
  endif;
 ?>
+<?endif;?>
