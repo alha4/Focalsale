@@ -1,8 +1,7 @@
 <?
- global $APPLICATION;
-  
+ global $APPLICATION,$currency_alias;
+ 
  $navchain = $arResult['products'];
-
  $APPLICATION->AddChainItem($navchain[0]['category_name'],"{$arResult[path]}?sect=".str_replace("%26amp%3B","%26",rawurlencode($navchain[0]['category_name']))."&currency=".$arResult['currency_value']);
 
  if($arResult[0]['category_name'] != $_GET['sect']) 
@@ -33,9 +32,9 @@ foreach($arResult['products'] as $item) :
 <a href="/detail.php?code=<?=$item['model_code']?>" >
 <?=$item['short_product_name']?></a>
 <br>
-<div class="price"><?=$item['currency']?> <?=$item['price']?> 
+<div class="price"><?=$currency_alias[ $item['currency'] ]?> <?=$item['price']?> 
 <?if( is_array($item['special']) ) : ?>
-<del><?=$item['currency'] ?> <?=$item['special']['normal_price']?></del> 
+<del><?=$currency_alias[ $item['currency'] ] ?> <?=$item['special']['normal_price']?></del> 
 <?endif;?>
 </div>
 
@@ -45,7 +44,7 @@ endforeach;
 ?>
 </div>
 <?
- $elements_on_page = $arResult['on_page'];
+ $elements_on_page = (int)$arParams['COUNT_ELEMENTS'];
  $total_products   = $arResult['pagination'];
  $total_pages      = ceil($total_products / $elements_on_page);
 ?>

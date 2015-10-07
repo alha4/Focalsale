@@ -10,7 +10,7 @@ $lifeTime = 30*60*24;
 
 $sect = $_GET['sect'];
 
-$elements_on_page = is_int($arParams['COUNT_ELEMENTS']) ? : 16;
+$elements_on_page = (int)$arParams['COUNT_ELEMENTS'];
  
 $offset = isset($_GET['page']) ? (int)$_GET['page'] : 0;
 
