@@ -8,7 +8,7 @@
 ?>
 <? if($arResult) : ?>
 <?
-  print_r($arResult['on_page']);
+ 
 ?>
 <div class="catalog-list">
 <?
@@ -23,7 +23,7 @@ foreach($arResult['products'] as $item) :
  $img_src = resizeImage($item['main_picture']);
 
 ?>
-<a href="/detail.php?code=<?=$item['model_code']?>" ><img class="cat-img" src="<?=$img_src?>" alt="<?=$item['short_product_name']?>" style="max-width:100px">
+<a href="<?=$arResult['detail_page']?>?code=<?=$item['model_code']?>" ><img class="cat-img" src="<?=$img_src?>" alt="<?=$item['short_product_name']?>" style="max-width:100px">
 </a>
 <br>
 <a href="/detail.php?code=<?=$item['model_code']?>" >

@@ -45,7 +45,7 @@ if($cache->StartDataCache($lifeTime, $cacheID) ) {
 
        $arResult['on_page'] = $elements_on_page;
        
-
+       $arResult['detail_page'] = $arParams['DETAIL_PATH'];
    }
 
    $this->IncludeComponentTemplate();
