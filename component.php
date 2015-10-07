@@ -6,7 +6,7 @@ if( !\Bitrix\Main\Loader::includeModule('alfa4.chinavasion') )
 
 $lifeTime = 30*60*24; 
  
-$cacheID = '_CAT_1'; 
+$cacheID = '_CAT_1_'; 
 
 $cache = new CPHPCache;
 
