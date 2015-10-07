@@ -1,12 +1,16 @@
 <?
- $APPLICATION->AddChainItem($arResult[0]['category_name'],"{$arResult[path]}?sect=".rawurlencode($arResult[0]['category_name'])."currency=".$arResult['currency_value']);
+ global $APPLICATION;
+  
+ $navchain = $arResult['products'];
+
+ $APPLICATION->AddChainItem($navchain[0]['category_name'],"{$arResult[path]}?sect=".str_replace("%26amp%3B","%26",rawurlencode($navchain[0]['category_name']))."&currency=".$arResult['currency_value']);
 
  if($arResult[0]['category_name'] != $_GET['sect']) 
 
-     $APPLICATION->AddChainItem($arResult[0]['subcategory_name'],"{$arResult[path]}?sect=".rawurlencode($_GET['sect'])."currency=".$arResult['currency_value']); 
+     $APPLICATION->AddChainItem($navchain[0]['subcategory_name'],"{$arResult[path]}?sect=".str_replace("%26amp%3B","%26",rawurlencode($_GET['sect']))."&currency=".$arResult['currency_value']); 
 
 ?>
-<? if($arResult) : ?>
+<? if($arResult['products']) : ?>
 <?
  
 ?>
