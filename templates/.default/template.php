@@ -1,4 +1,8 @@
 <?
+ $item = $arResult['item'];
+ if($item) : 
+?>
+<?
  global $APPLICATION,$currency_alias;
 
  $APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH.'/slimbox2.css');
@@ -13,10 +17,6 @@
 
 ?>
 <table class="product-detail"> 
-
-<?
-foreach($arResult['item'] as $item) :
-?>
 <tr>
 <td class="img-product">
 <div class="img-main">
@@ -55,7 +55,18 @@ foreach($arResult['item'] as $item) :
 
 </span>
 </div>
+<span>Shipping: 
+<? foreach($arResult['shipping'] as $k=>$ship_item) :?>
 
+<? echo $ship_item['name'];
+ 
+   if($k > 0 && $k != count($delivery) - 1) echo ', ';
+
+?> 
+<input class="ship-method" type="hidden" value="<?=$ship_item['name']?>#<?=$ship_item['price']?>">
+
+<? endforeach;?>
+</span>
 <?if($item['status'] == 'In Stock'):?>
 
 <div class="quanity"> Quantity: 
@@ -108,16 +119,14 @@ foreach($arResult['item'] as $item) :
 ?>
 </table>
 
-<?
-  endforeach;
-?>
+
 
 </div>
 <div id="tab_c2">
 
 <table>
 <tr><th colspan="2">Shipping from Chinese Warehouse</th></tr>
-<? foreach($delivery as $ship_item) :?>
+<? foreach($arResult['shipping'] as $ship_item) :?>
 
 <tr><td><?=$ship_item['name']?> <td> <?=$ship_item['delivery']?>
 <?endforeach;?>
@@ -160,7 +169,7 @@ foreach($arResult['item'] as $item) :
 
  });
 
- var CURRENCY = "<?=$currenname?>";
+ var CURRENCY = "<?=$item['currency']?>";
 
  var $qunty = $('#value-quantity');
 
@@ -230,3 +239,6 @@ foreach($arResult['item'] as $item) :
    
  });
 </script>
+<?
+  endif;
+?>

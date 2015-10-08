@@ -25,10 +25,25 @@ if( !\Bitrix\Main\Loader::includeModule('alfa4.chinavasion') ) die('не уда�
 
   $responce = getRequestChinavasion('getProductDetails', $data_request);
 
+  $data_request = array(
+   'currency' => "$currency_var",
+   "socket" => "EU",
+   "shipping_country_iso2" => "$country_code",
+   "products" => array(array(
+              "model_code" => "$code",
+              "quantity" => 1
+      )
+    )
+  );
+
+  $price = getRequestChinavasion('getPrice', $data_request);
+ 
+  $delivery = $price['shipping'];
+
   if($responce) {
 
-      $arResult['item'] = $responce['products'];
-
+      $arResult['item'] = $responce['products'][0];
+      $arResult['shipping']  = $delivery;
    }
 
    $this->IncludeComponentTemplate();
