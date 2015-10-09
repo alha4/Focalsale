@@ -15,10 +15,12 @@
           echo '</ul>';
         
      }
-      else {
+     else {
+
         echo '<li><a href="',$arParams['PATH_NAME'],'?sect=', rawurlencode($item['name']) ,'">', str_replace("&","&amp;",$item['name']), '</a></li>';
-     
-      }
-  }
+        
+    }
+ 
+  }            
 ?>
 </ul>

@@ -2,9 +2,9 @@
 
 if( !\Bitrix\Main\Loader::includeModule('alfa4.chinavasion') ) 
 
-    die('не удалось найти компонент [alfa4.chinavasion]');
+    die('не удалось найти модуль [alfa4.chinavasion]');
 
-$lifeTime = 30*60*24; 
+$lifeTime = $arParams['CAHCE_TIME']; 
  
 $cacheID = '_CAT_1_'; 
 
@@ -21,10 +21,9 @@ if($cache->StartDataCache($lifeTime, $cacheID) ) {
 
    if($responce) {
 
-       $arResult =  $responce['categories'];
+       $arResult = $responce['categories'];
 
    }
-
     
    $this->IncludeComponentTemplate();
 
@@ -42,5 +41,10 @@ if($cache->StartDataCache($lifeTime, $cacheID) ) {
    extract($cache->GetVars());
    $this->SetTemplateCachedData($templateCachedData);
 }
+$sections = array();
+foreach($arResult as $item) {
+         $sections[] = $item['name'];
+}
+$GLOBALS["CATEGORY"] = $sections;
  
 ?>
