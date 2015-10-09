@@ -6,7 +6,7 @@ if( !\Bitrix\Main\Loader::includeModule('alfa4.chinavasion') )
 
 $currency_var = $GLOBALS[$arParams['CURRENCY_VAR_NAME']];
 
-$lifeTime = 30*60*24; 
+$lifeTime = $arParams['CACHE_TIME']; 
 
 $sect = $_GET['sect'];
 
@@ -30,7 +30,7 @@ if($cache->StartDataCache($lifeTime, $cacheID) ) {
 
   );
 
-  $responce = getRequestChinavasion('getProductList', $data_request);
+  $responce = requestChinavasion('getProductList', $data_request);
 
 
   if($responce) {
