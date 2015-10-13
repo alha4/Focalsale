@@ -2,19 +2,19 @@
 
 if( !\Bitrix\Main\Loader::includeModule('alfa4.chinavasion') ) 
 
-    die('не удалось найти компонент [alfa4.chinavasion]');
+    die('не удалось подключить модуль [alfa4.chinavasion], проверьте наличие молуля в системе');
 
 $currency_var = $GLOBALS[$arParams['CURRENCY_VAR_NAME']];
 
 $lifeTime = $arParams['CACHE_TIME']; 
 
-$sect = $_GET['sect'];
+$sect     = $_GET['sect'];
 
-$elements_on_page = (int)$arParams['COUNT_ELEMENTS'];
- 
-$offset = isset($_GET['page']) ? (int)$_GET['page'] : 0;
+$offset   = isset($_GET['page']) ? (int)$_GET['page'] : 0;
 
-$cacheID = $sect.'_1_'.$offset.'_'.$currency_var;  
+$count_on_page = (int)$arParams['COUNT_ELEMENTS'];
+
+$cacheID  = $sect.'_'.$count_on_page.'_'.$offset.'_'.$lifeTime.'_'.$currency_var;  
 
 $cache = new CPHPCache;
 
@@ -22,48 +22,70 @@ if($cache->StartDataCache($lifeTime, $cacheID) ) {
    
    $data_request  = array(
 
-      'currency' => "$currency_var",
+      'currency'   => "$currency_var",
 
       'categories' => array("$sect"),
  
-      'pagination' => array("start"=>$offset,"count"=>$elements_on_page)
+      'pagination' => array("start"=>$offset,"count"=>$count_on_page)
 
-  );
+   );
 
-  $responce = requestChinavasion('getProductList', $data_request);
+   $responce = requestChinavasion('getProductList', $data_request);
 
+   if($responce['products']) {
 
-  if($responce) {
-
-       $arResult['products'] =   $responce['products'];
+       $arResult['products']   = $responce['products'];
 
        $arResult['pagination'] = $responce['pagination']['total'];
 
-       $arResult['path'] = $arParams['CATALOG_PATH'];
-  
-       $arResult['currency_value'] =  $currency_var; 
+       $arResult['currency_value'] = $currency_var; 
+        
+       $this->SetResultCacheKeys(array('products'));
 
-       $arResult['on_page'] = $elements_on_page;
-       
-       $arResult['detail_page'] = $arParams['DETAIL_PATH'];
+       $this->IncludeComponentTemplate();
+
+       $templateCachedData = $this->GetTemplateCachedData();
+
+       $cache->EndDataCache(
+         array(
+           "arResult" => $arResult,
+           "templateCachedData" => $templateCachedData    
+         )
+      );
+
+      $result = $arResult['products'];
+      $category_name  = $result[0]['category_name']; 
+
+      $APPLICATION->SetTitle($category_name);
+      $APPLICATION->SetPageProperty("keywords",   $category_name);
+      $APPLICATION->SetPageProperty("description",$category_name);
+
+      $APPLICATION->AddChainItem($category_name,"{$arParams[CATALOG_PATH]}?sect=".str_replace("%26amp%3B","%26",rawurlencode($category_name)));
+
+      if($category_name != $sect) 
+     
+         $APPLICATION->AddChainItem($result[0]['subcategory_name'],"{$arParams[CATALOG_PATH]}?sect=".str_replace("%26amp%3B","%26",rawurlencode($sect)));  
    }
 
-   $this->IncludeComponentTemplate();
-
-   $templateCachedData = $this->GetTemplateCachedData();
-
-   $cache->EndDataCache(
-      array(
-         "arResult" => $arResult,
-         "templateCachedData" => $templateCachedData    
-      )
-   );
-
 } else {
+  
+  extract($cache->GetVars());
+  $this->SetTemplateCachedData($templateCachedData);
 
-   extract($cache->GetVars());
-   $this->SetTemplateCachedData($templateCachedData);
+  if($arResult) {
 
+    $result = $arResult['products'];
+    $category_name  = $result[0]['category_name']; 
+
+    $APPLICATION->SetTitle($category_name);
+    $APPLICATION->SetPageProperty("keywords",   $category_name);
+    $APPLICATION->SetPageProperty("description",$category_name);
+
+    $APPLICATION->AddChainItem($category_name,"{$arParams[CATALOG_PATH]}?sect=".str_replace("%26amp%3B","%26",rawurlencode($category_name)));
+
+    if($category_name != $sect) 
+     
+       $APPLICATION->AddChainItem($result[0]['subcategory_name'],"{$arParams[CATALOG_PATH]}?sect=".str_replace("%26amp%3B","%26",rawurlencode($sect))); 
+  }
 }
- 
 ?>
