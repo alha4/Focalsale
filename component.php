@@ -49,21 +49,17 @@ if($cache->StartDataCache($cacheTime, $cacheID) ) {
 
       $arResult['products']   = $responce['products'];
 
-      //$arResult['pagination'] = $responce['pagination']['total'];
-
       $rs_ObjectList = new CDBResult;
 
       $rs_ObjectList->InitFromArray($arResult['products']);
-
       $rs_ObjectList->NavStart($count_on_page, false);
-
       $rs_ObjectList->NavPageCount = ceil(count($arResult['products'] ) / $count_on_page);
       $rs_ObjectList->NavPageNomer = $page;
       $rs_ObjectList->NavNum = 1;
       $rs_ObjectList->NavPageSize = $count_on_page;
       $rs_ObjectList->NavRecordCount = count($arResult['products']);
 
-      $arResult["NAV_STRING"] = $rs_ObjectList->GetPageNavString("products", "visual");
+      $arResult["NAV_STRING"] = $rs_ObjectList->GetPageNavString("products", "visual_sale");
 
       $arResult["PAGE_START"] = $rs_ObjectList->SelectedRowsCount() - ($rs_ObjectList->NavPageNomer - 1) * $rs_ObjectList->NavPageSize;
 
@@ -72,7 +68,7 @@ if($cache->StartDataCache($cacheTime, $cacheID) ) {
           $arResult['products'][] = $ar_Field;
       }
         
-      $this->SetResultCacheKeys(array('products','NAV_STRING'));
+      $this->SetResultCacheKeys(array('products','NAV_STRING','PAGE_START'));
 
       $this->IncludeComponentTemplate();
 

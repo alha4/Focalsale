@@ -7,7 +7,6 @@
 <?
   $page = intval($_GET['PAGEN_1']);
   $on_page = (int)$arParams['COUNT_ELEMENTS'];
-
   $arResult['products'] = array_slice($arResult['products'],$page * $on_page,$on_page);
 
   foreach($arResult['products'] as $item) :
@@ -33,24 +32,6 @@ endforeach;
 ?>
 </div>
 <?
- /*
-$elements_on_page = (int)$arParams['COUNT_ELEMENTS'];
- $total_products   = $arResult['pagination'];
- $total_pages      = ceil($total_products / $elements_on_page);
-*/
-print_r($arResult["NAV_STRING"]);
-?>
-<?
-if($total_products > $elements_on_page) :
-?>
-<div class="pages">
-<?
- /*for($i = 0 ; $i <= $total_pages; $i++) {
-   echo '<a href="',$arParams['CATALOG_PATH'],'?sect=',rawurlencode($_GET['sect']),"&amp;page=",($i),'"', ($_GET['page'] == $i ? ' class="curr-page"' : '')  ,'>',$i + 1,'</a> ';
- }*/
-?>
-</div>
-<?
- endif;
+ echo $arResult["NAV_STRING"];
 ?>
 <?endif;?>
