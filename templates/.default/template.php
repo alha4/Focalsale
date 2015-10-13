@@ -2,13 +2,16 @@
  global $APPLICATION,$currency_alias;
 ?>
 <? if($arResult['products']) : ?>
-
 <div class="catalog-list">
 <?
   $page = intval($_GET['PAGEN_1']);
   $on_page = (int)$arParams['COUNT_ELEMENTS'];
-  $arResult['products'] = array_slice($arResult['products'],$page * $on_page,$on_page);
 
+  if( $page * $on_page < count($arResult['products']) ) {
+    $arResult['products'] = array_slice($arResult['products'],$page * $on_page,$on_page);
+  } else {
+    $arResult['products'] = array_slice($arResult['products'],count($arResult['products']) - $on_page);
+  }
   foreach($arResult['products'] as $item) :
 ?>
 <div class="cat-item">
@@ -31,7 +34,9 @@
 endforeach;
 ?>
 </div>
+<div style="clear:both;">
 <?
  echo $arResult["NAV_STRING"];
 ?>
+</div>
 <?endif;?>

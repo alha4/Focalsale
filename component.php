@@ -7,7 +7,7 @@ if( !\Bitrix\Main\Loader::includeModule('alfa4.chinavasion') ) {
      return false;
 }
 
-CPageOption::SetOptionString("main", "nav_page_in_session", "N"); 
+//CPageOption::SetOptionString("main", "nav_page_in_session", "N"); 
 
 if(!isset($arParams['CURRENCY_VAR_NAME'])) {
    $currency_var = 'USD';
@@ -18,21 +18,19 @@ if(!isset($arParams["CACHE_TIME"]))
 
    $arParams["CACHE_TIME"] = 86400;
 
-   $sect  = $_GET['sect'];
+   $sect = $_GET['sect'];
    
    $page = intval($_GET['PAGEN_1']);
 
-$offset_page = isset($_GET['page']) ? (int)$_GET['page'] : 0;
+   $count_on_page = is_numeric($arParams['COUNT_ELEMENTS']) === true ? (int)$arParams['COUNT_ELEMENTS'] : 16;
 
-$count_on_page = is_numeric($arParams['COUNT_ELEMENTS']) === true ? (int)$arParams['COUNT_ELEMENTS'] : 16;
+   $cacheTime = $arParams['CACHE_TIME'];
 
-$cacheTime = $arParams['CACHE_TIME'];
+   $cacheID  = $sect.'_'.$count_on_page.'_'.$page.'_'.$cacheTime.'_'.$currency_var;  
 
-$cacheID  = $sect.'_'.$count_on_page.'_'.$offset_page.'_'.$cacheTime.'_'.$currency_var;  
+   $cache = new CPHPCache;
 
-$cache = new CPHPCache;
-
-if($cache->StartDataCache($cacheTime, $cacheID) ) {
+   if($cache->StartDataCache($cacheTime, $cacheID) ) {
    
    $data_request  = array(
 
@@ -43,14 +41,13 @@ if($cache->StartDataCache($cacheTime, $cacheID) ) {
       'pagination' => array("start"=>0,"count"=>500)
    );
 
-   $responce = requestChinavasion('getProductList', $data_request);
+   $responce = Chinavasion::request('getProductList', $data_request);
 
    if($responce['products']) {
 
       $arResult['products']   = $responce['products'];
 
       $rs_ObjectList = new CDBResult;
-
       $rs_ObjectList->InitFromArray($arResult['products']);
       $rs_ObjectList->NavStart($count_on_page, false);
       $rs_ObjectList->NavPageCount = ceil(count($arResult['products'] ) / $count_on_page);
@@ -61,14 +58,14 @@ if($cache->StartDataCache($cacheTime, $cacheID) ) {
 
       $arResult["NAV_STRING"] = $rs_ObjectList->GetPageNavString("products", "visual_sale");
 
-      $arResult["PAGE_START"] = $rs_ObjectList->SelectedRowsCount() - ($rs_ObjectList->NavPageNomer - 1) * $rs_ObjectList->NavPageSize;
+      //$arResult["PAGE_START"] = $rs_ObjectList->SelectedRowsCount() - ($rs_ObjectList->NavPageNomer - 1) * $rs_ObjectList->NavPageSize;
 
       while($ar_Field = $rs_ObjectList->Fetch()) {
 
           $arResult['products'][] = $ar_Field;
       }
         
-      $this->SetResultCacheKeys(array('products','NAV_STRING','PAGE_START'));
+      $this->SetResultCacheKeys(array('products','NAV_STRING'));
 
       $this->IncludeComponentTemplate();
 
@@ -82,8 +79,8 @@ if($cache->StartDataCache($cacheTime, $cacheID) ) {
       );
 
       $result = $arResult['products'];
-      $category_name  = $result[0]['category_name']; 
-
+      $category_name  = $result[0]['category_name'];
+ 
       $APPLICATION->SetTitle($category_name);
       $APPLICATION->SetPageProperty("keywords",   $category_name);
       $APPLICATION->SetPageProperty("description",$category_name);
