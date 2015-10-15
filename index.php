@@ -1,88 +1,72 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
+$APPLICATION->SetPageProperty("ROBOTS", "noindex, nofollow");
 $APPLICATION->SetPageProperty("not_show_nav_chain", "Y");
 $APPLICATION->SetTitle("Shopping Cart");
 $APPLICATION->SetAdditionalCSS(SITE_TEMPLATE_PATH.'/slimbox2.css');
 require_once $_SERVER['DOCUMENT_ROOT']."/tabgeo_country_v4.php";
 $ip = $_SERVER['REMOTE_ADDR'];
-
 $country_code = tabgeo_country_v4($ip);
-
 global $USER;
-
 ?>
-<h1>Your Shopping Cart <small id="count_items"></small></h1>
-
-<table width="700" id="cart-list">
-<tr class="title-cart"><td colspan="2">Product Name & Detail<td>Price<td>Quantity</tr>
+<h1>Your Shopping Cart</h1>
+<table id="cart-list">
+<tr><td colspan="2" class="title-cart">Product Name<td class="title-cart">Price<td class="title-cart">Quantity<td>Remove</td>
 </table>
-
-
 <?if(!$USER->IsAuthorized()):?>
 <div class="how-bay">
-<p>
-Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
+<p>Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
 <span class="log-buy">LOGIN AND BUY WITH DISCOUNTS AND GIFTS</span> or <br>
 <span class="reg-free">REGISTER FOR FREE!</span>
 </p>
 </div>
 <?endif;?>
 
-
 <?if($USER->IsAuthorized()):?>
 <div class="user-form">
 <h3>Your shipping address</h3> 
 <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" id="pay-form">
 <?
-
- $rsUser = CUser::GetByID($USER->GetID());
- $arUser = $rsUser->Fetch();
-
+  $rsUser = CUser::GetByID($USER->GetID());
+  $arUser = $rsUser->Fetch();
 ?>
-  <label>First name: <span class="required-label">*</span> <input name="first_name" type="text" title="Name" required value="<?=$arUser['NAME']?>"  /></label>
-  <label>Last name: <span class="required-label">*</span> <input name="last_name" type="text" title="LastName" required  value="<?=$arUser['LAST_NAME']?>" /></label>
-  <?if($country_code == 'US'):?>
-  <label>State: <select type="text" name="state">
+ <label>First name: <span class="required-label">*</span> <input name="first_name" type="text" title="Name" required value="<?=$arUser['NAME']?>"  /></label>
+ <label>Last name: <span class="required-label">*</span> <input name="last_name" type="text" title="LastName" required  value="<?=$arUser['LAST_NAME']?>" /></label>
+ <?if($country_code == 'US'):?>
+ <label>State: <select type="text" name="state">
   <?
- 
-     $f = fopen("state_base.txt","r");
+    $f = fopen("state_base.txt","r");
 
-     while (($data = fgetcsv($f, 1000, ",")) !== FALSE) {
+    while (($data = fgetcsv($f, 1000, ",")) !== FALSE) {
     
-       
-           echo '<option value="',$data[0],'">',$data[1] ,"</option>\n";
+       echo '<option value="',$data[0],'">',$data[1] ,"</option>\n";
      
     }
-   fclose($f);
-
+    fclose($f);
   ?>
   </select></label>
 <?else : ?>
   <label>State/Region: <input name="state" type="text" title="State/Region" value="<?=$arUser['PERSONAL_STATE']?>"></label>
 <?endif;?>
   <label>City: <span class="required-label">*</span> <input name="city" type="text" title="City" required  value="<?=$arUser['PERSONAL_CITY']?>"/></label>
-  <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="xxxxxx" required value="<?=$arUser['PERSONAL_ZIP']?>" /></label>
-  <label>Address: <span class="required-label">*</span>  <input type="text" name="address1" type="text" title="88 Street" required  value="<?=$arUser['PERSONAL_STREET']?>" /></label> 
-  <label>Phone:   <span class="required-label">*</span>  <input id="custom_var" type="text" placeholder="+x xxx-xx-xx" required pattern="(\+?\d[- .]*){4,13}" title="International, national, state or local phone number"/></label>
-
+  <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="xxxxxx" required pattern="(\d){4,6}" value="<?=$arUser['PERSONAL_ZIP']?>" /></label>
+  <label>Address: <span class="required-label">*</span>  <input type="text" name="address1" title="88 Street" required  value="<?=$arUser['PERSONAL_STREET']?>" /></label> 
+  <label>Phone:   <span class="required-label">*</span>  <input id="custom_var" type="tel" placeholder="+x xxx-xx-xx" required pattern="(\+?\d[- .]*){4,13}" title="International, national, state or local phone number"/></label>
   <input type="hidden" name="address_override" value="1" />
   <input type="hidden" name="currency_code" value="USD" />
-  <input type="hidden" name="country" value="<?=$country_code // echo 'US';?>" />
+  <input type="hidden" name="country" value="<?=$country_code;?>" />
   <input type="hidden" name="cmd" value="_cart" /> 
   <input type="hidden" name="upload" value="1" /> 
   <input type="hidden" name="business" value="ivalderman345@mail.ru" /> 
   <input type="hidden" name="no_shipping" value="0" />
   <input type="hidden" name="return" value="http://www.focalsale.com/cart/ok.php"/>
   <input type="hidden" name="notify_url" value="http://www.focalsale.com/cart/transaction.php"/>
-
   <input type="hidden" id="orig_custon" name="custom" >
   <div id="items-pay"></div>
-
-  <input type="image" src="/images/pay-button.png" alt="" class="order-item2" id="order-send">
+  <input type="image" src="/images/pay-button.png" alt="pay" class="order-item2" id="order-send">
 </form>
 </div>
 <script>
- 
  $('#custom_var').change(function() {
    
   var prefix_uid = <?=$USER->GetID()?>;   
@@ -97,42 +81,34 @@ Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
     
  });
 </script>
-
 <? else : ?>
-
 <div class="user-form">
 <h3>Quick buying</h3>
 <p>Quick purchase without savings discount and storage order history in your account.</p>
-</p>
-
 <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" id="pay-form">
-
  <label>First name: <span class="required-label">*</span> <input name="first_name" type="text" title="Name" required   /></label>
  <label>Last name: <span class="required-label">*</span> <input name="last_name" type="text" title="LastName" required /></label>
- <?if($country_code == 'US'):?>
+<?if($country_code == 'US'):?>
   <label>State: <select type="text" name="state">
-  <?
- 
-     $f = fopen("state_base.txt","r");
+<?
+  $f = fopen("state_base.txt","r");
 
-     while (($data = fgetcsv($f, 1000, ",")) !== FALSE) {
+   while(($data = fgetcsv($f, 1000, ",")) !== FALSE) {
     
-       
-           echo '<option value="',$data[0],'">',$data[1] ,"</option>\n";
+     echo '<option value="',$data[0],'">',$data[1] ,"</option>\n";
      
-    }
+   }
    fclose($f);
-
-  ?>
-  </select></label>
+?>
+</select>
+</label>
 <?else : ?>
  <label>State/Region: <input name="state" type="text" title="State/Region"></label>
 <?endif;?>
  <label>City: <span class="required-label">*</span> <input name="city" type="text" title="City" required /></label>
- <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" titile="xxxxx" required /></label>
- <label>Address: <span class="required-label">*</span> <input type="text" name="address1" type="text" title="Street 99/a 22" required  /></label> 
- <label>Phone:   <span class="required-label">*</span> <input id="custom_var" type="text" placeholder="+x xxx xxx-xx-xx"  required pattern="(\+?\d[- .]*){4,13}" title="International, national, state or local phone number" /></label>
- 
+ <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="xxxxx" required /></label>
+ <label>Address: <span class="required-label">*</span> <input type="text" name="address1" title="Street 99/a 22" required  /></label> 
+ <label>Phone:   <span class="required-label">*</span> <input id="custom_var" type="tel" placeholder="+x xxx xxx-xx-xx"  required pattern="(\+?\d[- .]*){4,13}" title="International, national, state or local phone number" /></label>
  <input type="hidden" id="orig_custon" name="custom">
  <input type="hidden" name="address_override" value="0" />
  <input type="hidden" name="currency_code" value="USD" />
@@ -143,15 +119,11 @@ Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
  <input type="hidden" name="no_shipping" value="0" />
  <input type="hidden" name="return" value="http://www.focalsale.com/cart/ok.php"/>
  <input type="hidden" name="notify_url" value="http://www.focalsale.com/cart/transaction.php"/>
-
  <div id="items-pay"></div>
-
- <input type="image" src="/images/pay-button.png" alt="" class="order-item2" id="order-send">
+ <input type="image" src="/images/pay-button.png" alt="pay" class="order-item2" id="order-send">
 </form>
 </div>
-
 <script>
- 
  $('#custom_var').change(function() {
    
   var prefix_uid = 'noauth';  
@@ -227,7 +199,6 @@ Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
 </div>
 
 <?endif;?>
-
 <script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/slimbox2.js"></script>
 <script>
 
@@ -386,8 +357,6 @@ Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
 
  }
 
- $('#count_items').html(  '( '  + String( items.length ) + ' items )' );
-
  var storage_buffer = [],
 
      ship_codes = [];
@@ -492,7 +461,7 @@ Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
 
     $(pay_form).append('<input type="hidden" class="vq_' + item_c  + '" name="quantity_' +  item_c + '" value="' + prod[1] + '">'); 
 
-    $(cart_list).after('<tr><td><a href="' + prod[4] + '"  class="full-img"  rel="lightbox"><img class="cart-prod-img" src="' + prod[4] + '" alt=""></a><td><a class="title-prod" href="/detail.php?code='+ prod[3] + '">' + prod[0] + '</a><td class="cost_price" id="price_' + item_c + '"></td><td><div class="quanity"><div class="quanity-control"><span class="down"></span> <input type="number" size="2" id="cv_' + item_c + '" value="'+ prod[1] + '" min="1" max="10" class="value-quantity"><span class="up"></span></div></div><a href="javascript:void(0)" class="control-basket" title="remove"><img src="/images/delete.png" alt="Remove"></a>');
+    $(cart_list).after('<tr><td class="cart-prod-img"><a href="' + prod[4] + '"  class="full-img"  rel="lightbox"><img src="' + prod[4] + '" alt=""></a><td><a class="title-prod" href="/detail.php?code='+ prod[3] + '">' + prod[0] + '</a><td class="cost_price" id="price_' + item_c + '"></td><td><div class="quanity"><div class="quanity-control"><span class="down"></span> <input type="number" size="2" id="cv_' + item_c + '" value="'+ prod[1] + '" min="1" max="10" class="value-quantity"><span class="up"></span></div></div><td><a href="javascript:void(0)" class="control-basket" title="remove"><img src="/images/delete.png" alt="Remove"></a>');
 
     convert_price(prod[2],'price_' + item_c) ;
 
@@ -538,7 +507,7 @@ Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
 
    html_select+='</select>';
 
-   $(cart_list).after('<tr><td>' + html_select);
+   $(cart_list).after('<tr><td style="display:none;">' + html_select);
 
   } 
 
@@ -566,7 +535,7 @@ Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
   
   ship_icons+=  '<tr><td width="220">Select shipping method: <div class="ship-comp">'+  html_radio +'</div>';
 
-  $('#cart-list tr:last').after('<tr><td colspan="4" class="left-spacing-cell" id="ship-icon"><table width="600" id="table-ship"><tr><td width="220">Shipping companies: ' + ship_icons + ' </table><tr class="center-row"><td colspan="4" class="total-cell">Total  <span id="total"></span> ' + CURRENTCY );
+  $('#cart-list tr:last').after('<tr><td colspan="5" class="left-spacing-cell" id="ship-icon"><table width="600" id="table-ship"><tr><td width="220">Shipping companies: ' + ship_icons + ' </table><tr class="center-row"><td colspan="5" class="total-cell">Total  <span id="total"></span> ' + CURRENTCY );
 
   var shipping_data = $('.shipping-data');
 
@@ -716,7 +685,7 @@ Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
 
  $('.control-basket').click(function(e) {
 
-   var prod_id = $(e.target).parent().parent().prev().prev().first().text();
+   var prod_id = $(e.target).parent().parent().prev().prev().prev().first().text();
 
    var basket = new Basket("sale");
  
