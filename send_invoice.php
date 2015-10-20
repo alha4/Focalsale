@@ -9,7 +9,9 @@ $doc_id = $_SESSION['did'];
 $event_id = 'SEND_PDF_INVOICE';
 $site_id = 's1';
 
-$arFields = array("EMAIL_TO"=>"a.i.n.1989@mail.ru");
+$cmail= $_SESSION['eml'];
+
+$arFields = array("EMAIL_TO"=>"a.i.n.1989@mail.ru,$cmail");
 
 $pdf_file = CFile::GetByID( $doc_id );
 

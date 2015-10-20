@@ -11,7 +11,7 @@ global $USER;
 ?>
 <h1>Your Shopping Cart</h1>
 <table id="cart-list">
-<tr><td colspan="2" class="title-cart">Product Name<td class="title-cart">Price<td class="title-cart">Quantity<td>Remove</td>
+<tr><td colspan="2" class="title-cart">Product Name & Details<td class="title-cart">Price<td class="title-cart">Quantity<td>Remove</td>
 </table>
 <?if(!$USER->IsAuthorized()):?>
 <div class="how-bay">
@@ -49,9 +49,9 @@ global $USER;
   <label>State/Region: <input name="state" type="text" title="State/Region" value="<?=$arUser['PERSONAL_STATE']?>"></label>
 <?endif;?>
   <label>City: <span class="required-label">*</span> <input name="city" type="text" title="City" required  value="<?=$arUser['PERSONAL_CITY']?>"/></label>
-  <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="xxxxxx" required pattern="(\d){4,6}" value="<?=$arUser['PERSONAL_ZIP']?>" /></label>
+  <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="12345" required pattern="(\d){4,6}" value="<?=$arUser['PERSONAL_ZIP']?>" /></label>
   <label>Address: <span class="required-label">*</span>  <input type="text" name="address1" title="88 Street" required  value="<?=$arUser['PERSONAL_STREET']?>" /></label> 
-  <label>Phone:   <span class="required-label">*</span>  <input id="custom_var" type="tel" placeholder="+x xxx-xx-xx" required pattern="(\+?\d[- .]*){4,13}" title="International, national, state or local phone number"/></label>
+  <label>Phone:   <span class="required-label">*</span>  <input id="custom_var" type="tel" required pattern="(\+?\d[- .]*){4,13}" title="International,national,local phone number"/></label>
   <input type="hidden" name="address_override" value="1" />
   <input type="hidden" name="currency_code" value="USD" />
   <input type="hidden" name="country" value="<?=$country_code;?>" />
@@ -69,15 +69,13 @@ global $USER;
 <script>
  $('#custom_var').change(function() {
    
-  var prefix_uid = <?=$USER->GetID()?>;   
+ var prefix_uid = <?=$USER->GetID()?>,   
 
-  var curr_val = $(this).val();
+     curr_val = $(this).val(),
   
-  var ship_var = $('.radio-ship:checked').val();
+     ship_var = $('.radio-ship:checked').val();
 
-  //console.log( ship_var );
-
-  $('#orig_custon').val(curr_val + '#' + prefix_uid + '#' + ship_var + '#' + '<?=$currenname ?>' );     
+     $('#orig_custon').val(curr_val + '#' + prefix_uid + '#' + ship_var + '#' + '<?=$currenname ?>' );     
     
  });
 </script>
@@ -106,9 +104,9 @@ global $USER;
  <label>State/Region: <input name="state" type="text" title="State/Region"></label>
 <?endif;?>
  <label>City: <span class="required-label">*</span> <input name="city" type="text" title="City" required /></label>
- <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="xxxxx" required /></label>
- <label>Address: <span class="required-label">*</span> <input type="text" name="address1" title="Street 99/a 22" required  /></label> 
- <label>Phone:   <span class="required-label">*</span> <input id="custom_var" type="tel" placeholder="+x xxx xxx-xx-xx"  required pattern="(\+?\d[- .]*){4,13}" title="International, national, state or local phone number" /></label>
+ <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="12345" required pattern="(\d){4,6}" /></label>
+ <label>Address: <span class="required-label">*</span> <input type="text" name="address1" title="99 Street" required /></label> 
+ <label>Phone:   <span class="required-label">*</span> <input id="custom_var" type="tel" required pattern="(\+?\d[- .]*){4,13}" title="International, national, local phone number" /></label>
  <input type="hidden" id="orig_custon" name="custom">
  <input type="hidden" name="address_override" value="0" />
  <input type="hidden" name="currency_code" value="USD" />
@@ -461,7 +459,7 @@ global $USER;
 
     $(pay_form).append('<input type="hidden" class="vq_' + item_c  + '" name="quantity_' +  item_c + '" value="' + prod[1] + '">'); 
 
-    $(cart_list).after('<tr><td class="cart-prod-img"><a href="' + prod[4] + '"  class="full-img"  rel="lightbox"><img src="' + prod[4] + '" alt=""></a><td><a class="title-prod" href="/detail.php?code='+ prod[3] + '">' + prod[0] + '</a><td class="cost_price" id="price_' + item_c + '"></td><td><div class="quanity"><div class="quanity-control"><span class="down"></span> <input type="number" size="2" id="cv_' + item_c + '" value="'+ prod[1] + '" min="1" max="10" class="value-quantity"><span class="up"></span></div></div><td><a href="javascript:void(0)" class="control-basket" title="remove"><img src="/images/delete.png" alt="Remove"></a>');
+    $(cart_list).after('<tr><td class="cart-prod-img"><a href="' + prod[4] + '"  class="full-img"  rel="lightbox"><img src="' + prod[4] + '" alt=""></a><td><a class="title-prod" href="/detail.php?code='+ prod[3] + '">' + prod[0] + '</a><td class="cost_price" id="price_' + item_c + '"></td><td><div class="quanity-control"><span class="down"></span> <input type="number" size="2" id="cv_' + item_c + '" value="'+ prod[1] + '" min="1" max="10" class="value-quantity"><span class="up"></span></div><td><a href="javascript:void(0)" class="control-basket" title="remove"><img src="/images/delete.png" alt="Remove"></a>');
 
     convert_price(prod[2],'price_' + item_c) ;
 
@@ -623,7 +621,6 @@ global $USER;
 
  }
 
-
  function update_basket() {
 
   var basket = new Basket("sale"),
@@ -664,17 +661,6 @@ global $USER;
 
  function updateTotal(val,opt) {
 
-    /*var curr_val = parseFloat( Number( $('#total').html() ).toFixed(2) );
-  
-
-    if( opt == 'sub' ) {
-        curr_val-=val;
-        
-    }
-    if( opt == 'add' ) {
-        curr_val+=val;
-      
-    }*/
 
     $('#total').html(  summ_total() );    
 
@@ -858,8 +844,6 @@ global $USER;
    });
 
 }
-
  //console.log( inputValidateSupport() );
 </script>
-
 <?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

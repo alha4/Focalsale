@@ -66,6 +66,7 @@ class PaypalSinglePayment {
              "txn_id"=>      $post['txn_id'],
              "ipn_track_id"=>$post['ipn_track_id'],
              "payer_email" =>$post['receiver_email'],
+             "buyler_email"=>$post['payer_email'],
              "user_id" =>    $user_id,
              "payment_status" => $post['payment_status'],
              "txn_date" =>   date("d.m.Y H:i:s")

@@ -19,6 +19,8 @@ $is_register_user = isRegisterUser($responce[1]);
 
 $order_id = getOrderID($_GET['tx'],$responce[1]);
 
+$email_report = getUserEmail($_GET['tx'],$responce[1]);
+
 if($order_id) :
 
 ?>
@@ -30,11 +32,11 @@ if($order_id) :
 
 <p>To trace the history of your orders you can in your profile <a href="/profile/">My profile</a></p>
 
-<p>Get invoice on the link <a href="<?=$APPLICATION->GetCurDir()?>pdfgen.php?report_blank=<?=$order_id ?>" target="blank">invoice PDF</a></p>
+<p>Get invoice on the link <a href="<?=$APPLICATION->GetCurDir()?>pdfgen.php?report_blank=<?=$order_id ?>&eml=<?=$email_report?>" target="blank">invoice PDF</a></p>
 
 <? else : ?>
 
-<p>Get invoice on the link <a href="<?=$APPLICATION->GetCurDir()?>pdfgen.php?report_blank=<?=$order_id ?>" target="blank">invoice PDF</a></p>
+<p>Get invoice on the link <a href="<?=$APPLICATION->GetCurDir()?>pdfgen.php?report_blank=<?=$order_id ?>&eml=<?=$email_report?>" target="blank">invoice PDF</a></p>
 
 
 <? 

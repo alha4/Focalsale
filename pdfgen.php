@@ -59,7 +59,7 @@ class Report {
     return $dataPeport;
   }
 
-  public function create($order_id) {
+  public function create($order_id,$email_to = false) {
  
     $data = $this->parseData($order_id);
 
@@ -234,6 +234,7 @@ class Report {
 
   $_SESSION['did']  = $fid;
   $_SESSION['ord']  = $order_id;
+  $_SESSION['eml']  = $email_to;
 
   $pdf->Output('doc.pdf', 'I');
 
@@ -243,4 +244,4 @@ class Report {
 
 }
 $report = new Report();
-$report->create($_GET['report_blank']);
+$report->create($_GET['report_blank'],$_GET['eml']);
