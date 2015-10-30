@@ -2,6 +2,10 @@
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 require($_SERVER["DOCUMENT_ROOT"]."/cart/order_status.php");
 
+if( !isset($_SESSION['confirm_t']) ) 
+
+     $_SESSION['confirm_t'] = 0;
+
 $APPLICATION->SetPageProperty("not_show_nav_chain", "Y");
 $APPLICATION->SetTitle(" ");
 
@@ -50,6 +54,8 @@ if($order_id) :
 </script>
 <?else :?>
 
+<? if($_SESSION['confirm_t'] < 5): ?>
+
 <h1>Please wait for confirmation of the transaction.</h1>
 
 
@@ -92,6 +98,14 @@ setInterval(function() {
 
 </script>
 
+<?
+  $_SESSION['confirm_t'] = $_SESSION['confirm_t'] + 1;
+?>
+<?else:?>
+  <p>Your transaction cannot be reported, repeat the order you may have used the correct address for the delivery and shipping method</p>
+
+<? unset($_SESSION['confirm_t']); ?>
+<?endif;?>
 <?
  endif;
 ?>

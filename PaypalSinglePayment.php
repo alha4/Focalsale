@@ -155,7 +155,7 @@ class PaypalSinglePayment {
 
      }
 
-     throw new Exception(PaypalSinglePayment::ERROR_ORDER_CREATE.' '.$res);
+     throw new Exception(PaypalSinglePayment::ERROR_ORDER_CREATE.' '.$res.'-'.date("d.m.Y H:i:s"));
 
      return false;
 

@@ -13,43 +13,44 @@ global $USER;
 <table id="cart-list">
 <tr><td colspan="2" class="title-cart">Product Name & Details<td class="title-cart">Price<td class="title-cart">Quantity<td>Remove</td>
 </table>
+
 <?if(!$USER->IsAuthorized()):?>
 <div class="how-bay">
 <p>Now you can <span class="buy-quik">BUY QUICKLY</span> or <br>
-<span class="log-buy">LOGIN AND BUY WITH DISCOUNTS AND GIFTS</span> or <br>
-<span class="reg-free">REGISTER FOR FREE!</span>
+<span class="log-buy">LOGIN AND BUY WITH DISCOUNTS AND GIFTS</span> or 
+<a href="/register/" class="reg-free">REGISTER FOR FREE!</a>
 </p>
 </div>
 <?endif;?>
 
 <?if($USER->IsAuthorized()):?>
-<div class="user-form">
+<div class="user-form tabs">
 <h3>Your shipping address</h3> 
-<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" id="pay-form">
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="pay-form">
 <?
   $rsUser = CUser::GetByID($USER->GetID());
   $arUser = $rsUser->Fetch();
 ?>
- <label>First name: <span class="required-label">*</span> <input name="first_name" type="text" title="Name" required value="<?=$arUser['NAME']?>"  /></label>
- <label>Last name: <span class="required-label">*</span> <input name="last_name" type="text" title="LastName" required  value="<?=$arUser['LAST_NAME']?>" /></label>
+ <label>First name: <span class="required-label">*</span> <input name="first_name" type="text" title="Name" pattern="^\D+" required value="<?=$arUser['NAME']?>"  /></label>
+ <label>Last name: <span class="required-label">*</span> <input name="last_name" type="text" title="Last Name" required pattern="^\D+" value="<?=$arUser['LAST_NAME']?>" /></label>
  <?if($country_code == 'US'):?>
  <label>State: <select type="text" name="state">
-  <?
-    $f = fopen("state_base.txt","r");
+ <?
+   $f = fopen("state_base.txt","r");
 
-    while (($data = fgetcsv($f, 1000, ",")) !== FALSE) {
+   while(($data = fgetcsv($f, 1000, ",")) !== FALSE) {
     
        echo '<option value="',$data[0],'">',$data[1] ,"</option>\n";
      
-    }
-    fclose($f);
-  ?>
-  </select></label>
+   }
+   fclose($f);
+ ?>
+ </select></label>
 <?else : ?>
   <label>State/Region: <input name="state" type="text" title="State/Region" value="<?=$arUser['PERSONAL_STATE']?>"></label>
 <?endif;?>
-  <label>City: <span class="required-label">*</span> <input name="city" type="text" title="City" required  value="<?=$arUser['PERSONAL_CITY']?>"/></label>
-  <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="12345" required pattern="(\d){4,6}" value="<?=$arUser['PERSONAL_ZIP']?>" /></label>
+  <label>City: <span class="required-label">*</span> <input name="city" type="text" title="City" required pattern="^\D+" value="<?=$arUser['PERSONAL_CITY']?>"/></label>
+  <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="12345" required pattern="(\d){2,6}" value="<?=$arUser['PERSONAL_ZIP']?>" /></label>
   <label>Address: <span class="required-label">*</span>  <input type="text" name="address1" title="88 Street" required  value="<?=$arUser['PERSONAL_STREET']?>" /></label> 
   <label>Phone:   <span class="required-label">*</span>  <input id="custom_var" type="tel" required pattern="(\+?\d[- .]*){4,13}" title="International,national,local phone number"/></label>
   <input type="hidden" name="address_override" value="1" />
@@ -57,11 +58,11 @@ global $USER;
   <input type="hidden" name="country" value="<?=$country_code;?>" />
   <input type="hidden" name="cmd" value="_cart" /> 
   <input type="hidden" name="upload" value="1" /> 
-  <input type="hidden" name="business" value="ivalderman345@mail.ru" /> 
+  <input type="hidden" name="business" value="adexalltd@gmail.com" /> 
   <input type="hidden" name="no_shipping" value="0" />
   <input type="hidden" name="return" value="http://www.focalsale.com/cart/ok.php"/>
   <input type="hidden" name="notify_url" value="http://www.focalsale.com/cart/transaction.php"/>
-  <input type="hidden" id="orig_custon" name="custom" >
+  <input type="hidden" id="orig_custom" name="custom" >
   <div id="items-pay"></div>
   <input type="image" src="/images/pay-button.png" alt="pay" class="order-item2" id="order-send">
 </form>
@@ -75,25 +76,33 @@ global $USER;
   
      ship_var = $('.radio-ship:checked').val();
 
-     $('#orig_custon').val(curr_val + '#' + prefix_uid + '#' + ship_var + '#' + '<?=$currenname ?>' );     
+     $('#orig_custom').val(curr_val + '#' + prefix_uid + '#' + ship_var + '#' + '<?=$currenname ?>' );     
     
  });
 </script>
 <? else : ?>
+<section class="tabs">
+<input id="tab_1" type="radio" name="tab" checked="checked" />
+<input id="tab_2" type="radio" name="tab" />	
+<label for="tab_1" id="tab_l1">Quick buying</label>
+<label for="tab_2" id="tab_l2">LogIn / Register</label>
+<div style="clear:both"></div>
+<div class="tabs_cont">
+<div id="tab_c1">
 <div class="user-form">
 <h3>Quick buying</h3>
 <p>Quick purchase without savings discount and storage order history in your account.</p>
-<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" id="pay-form">
- <label>First name: <span class="required-label">*</span> <input name="first_name" type="text" title="Name" required   /></label>
- <label>Last name: <span class="required-label">*</span> <input name="last_name" type="text" title="LastName" required /></label>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="pay-form">
+ <label>First name: <span class="required-label">*</span> <input name="first_name" type="text" title="Name" required  pattern="^\D+" /></label>
+ <label>Last name: <span class="required-label">*</span> <input name="last_name" type="text" title="Last Name" required pattern="^\D+" /></label>
 <?if($country_code == 'US'):?>
   <label>State: <select type="text" name="state">
 <?
   $f = fopen("state_base.txt","r");
 
-   while(($data = fgetcsv($f, 1000, ",")) !== FALSE) {
+  while(($data = fgetcsv($f, 1000, ",")) !== FALSE) {
     
-     echo '<option value="',$data[0],'">',$data[1] ,"</option>\n";
+    echo '<option value="',$data[0],'">',$data[1] ,"</option>\n";
      
    }
    fclose($f);
@@ -101,19 +110,36 @@ global $USER;
 </select>
 </label>
 <?else : ?>
- <label>State/Region: <input name="state" type="text" title="State/Region"></label>
+ <label>State/Region:
+ <select name="state">
+<?
+ $f = fopen("region_codes.txt","r");
+
+ while(($data = fgetcsv($f, 1000, ",")) !== FALSE) {
+    
+   if(strcmp($data[0],$country_code) == 0 ) {
+          
+      echo '<option value="',$data[2],'">',$data[2],"</option>";
+         
+   }
+     
+  }
+  fclose($f);
+?>
+</select>
+</label>
 <?endif;?>
- <label>City: <span class="required-label">*</span> <input name="city" type="text" title="City" required /></label>
- <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="12345" required pattern="(\d){4,6}" /></label>
+ <label>City: <span class="required-label">*</span> <input name="city" type="text" title="City" required pattern="^\D+" /></label>
+ <label>ZIP/Post Code: <span class="required-label">*</span> <input name="zip" type="text" title="12345" required pattern="(\d){2,6}" /></label>
  <label>Address: <span class="required-label">*</span> <input type="text" name="address1" title="99 Street" required /></label> 
  <label>Phone:   <span class="required-label">*</span> <input id="custom_var" type="tel" required pattern="(\+?\d[- .]*){4,13}" title="International, national, local phone number" /></label>
- <input type="hidden" id="orig_custon" name="custom">
+ <input type="hidden" id="orig_custom" name="custom">
  <input type="hidden" name="address_override" value="0" />
  <input type="hidden" name="currency_code" value="USD" />
  <input type="hidden" name="country" value="<?=$country_code?>" />
  <input type="hidden" name="cmd" value="_cart" /> 
  <input type="hidden" name="upload" value="1" /> 
- <input type="hidden" name="business" value="ivalderman345@mail.ru" /> 
+ <input type="hidden" name="business" value="adexalltd@gmail.com" /> 
  <input type="hidden" name="no_shipping" value="0" />
  <input type="hidden" name="return" value="http://www.focalsale.com/cart/ok.php"/>
  <input type="hidden" name="notify_url" value="http://www.focalsale.com/cart/transaction.php"/>
@@ -124,23 +150,24 @@ global $USER;
 <script>
  $('#custom_var').change(function() {
    
-  var prefix_uid = 'noauth';  
+  var prefix_uid = 'noauth', 
  
-      prefix_uid+= String( 1 + (9999 - 1) * Math.random() ).substr(0,4);
+      prefix_uid+= String( 1 + (9999 - 1) * Math.random() ).substr(0,4),
 
-  var curr_val = $(this).val();
+      curr_val = $(this).val(),
   
-  var ship_var = $('.radio-ship:checked').val();
+      ship_var = $('.radio-ship:checked').val();
 
-  $('#orig_custon').val(curr_val + '#' + prefix_uid + '#' + ship_var + '#' + '<?=$currenname ?>' );     
+      $('#orig_custom').val(curr_val + '#' + prefix_uid + '#' + ship_var + '#' + '<?=$currenname ?>' );     
     
  });
 </script>
-
+</div>
 <?endif;?>
 
 <?if(!$USER->IsAuthorized()):?>
 
+<div id="tab_c2">
 <div class="user-form">
 <h3>Login to FocalSale</h3>
 <p>Login to your account to quickly fill in shipping addres, save order history and get discount and gifts.</p>
@@ -158,57 +185,20 @@ global $USER;
 	false
 );?>
 </div>
-<div class="user-form">
-<h3>New to FocalSale? Register for free!</h3>
-<?$APPLICATION->IncludeComponent(
-	"bitrix:main.register", 
-	"register", 
-	array(
-		"COMPONENT_TEMPLATE" => "register",
-		"SHOW_FIELDS" => array(
-			0 => "NAME",
-			1 => "LAST_NAME",
-			2 => "PERSONAL_PHONE",
-			3 => "PERSONAL_STREET",
-			4 => "PERSONAL_CITY",
-			5 => "PERSONAL_ZIP",
-		),
-		"REQUIRED_FIELDS" => array(
-			0 => "EMAIL",
-			1 => "NAME",
-			2 => "SECOND_NAME",
-			3 => "LAST_NAME",
-			4 => "PERSONAL_PHONE",
-			5 => "PERSONAL_STREET",
-			6 => "PERSONAL_CITY",
-			7 => "PERSONAL_ZIP",
-		),
-		"AUTH" => "Y",
-		"USE_BACKURL" => "Y",
-		"SUCCESS_PAGE" => "/register/done.php",
-		"SET_TITLE" => "N",
-		"USER_PROPERTY" => array(
-		),
-		"USER_PROPERTY_NAME" => ""
-	),
-	false
-);?>
-
 </div>
-
+</div>
+</section>
 <?endif;?>
-<script type="text/javascript" src="<?=SITE_TEMPLATE_PATH?>/js/slimbox2.js"></script>
 <script>
+ var CURRENTCY = '<?=$currenname ?>',
 
- var CURRENTCY = '<?=$currenname ?>';
+     BASE_CURRENTCY = 'USD',
 
- var BASE_CURRENTCY = 'USD';
-
- var ICON_FOLDER = '/images/';
+     ICON_FOLDER = '/images/';
 
  function get_ship_icon(ship_code) {
 
-    switch(ship_code) {
+   switch(ship_code) {
      
       case "DHL" : return 'dhl';
       break;
@@ -232,13 +222,13 @@ global $USER;
 
  }
 
- function convert_price(val,elm) {
+ function convert_basket_price(val,elm) {
 
-   var basket = new Basket("sale");
+   var basket = new Basket("sale"),
 
-   var from =  basket.getPriceCode();
+       from   = basket.getPriceCode();
 
-   if(from == CURRENTCY) {
+   if(from === CURRENTCY) {
 
       $('#' + elm).html( Number(val).toFixed(2) );
 
@@ -247,54 +237,48 @@ global $USER;
       return false;
    }
 
-
    $.ajax({ url : 'converter.php',type : 'POST', data : 'from_valute=' + from + '&to=' + CURRENTCY + '&cost=' + val,success : function(resp){
   
      resp = JSON.parse(resp);
     
-     if( resp["result"] == true && resp["error"] == "") {
+     if(resp["result"] == true && resp["error"] == "") {
 
-       $('#' + elm).html( Number(resp["total"]).toFixed(2) );
+        $('#' + elm).html( Number(resp["total"]).toFixed(2) );
 
         var summ_t = summ_total();
 
             $('#total').html(summ_t);
 
-       //console.log('convert responce = ' +   Number(resp["total"]).toFixed(2) + ' ==' + 'from_curency=' + from + '&cost=' + val + ' valuta' + resp["currency"]);
-
      } else {
         console.log( resp["error"]);
     }
 
-  }}); 
+   }}); 
 
- 
  }
-
+ 
  function convert_ship(val,elm,total_elm) {
 
-   var basket = new Basket("sale");
+   var basket = new Basket("sale"),
 
-   var from =  basket.getPriceCode();
+       from   = basket.getPriceCode();
 
-   if(from == CURRENTCY) {
+   if(from === CURRENTCY) {
 
-       //$(total_elm).html( parseFloat(Number(val).toFixed(2)) );
+      $(elm).val( Number(val).toFixed(2) );
 
-       $(elm).val( Number(val).toFixed(2) );
+      $(total_elm).html(ship_total());  
 
-       $(total_elm).html(ship_total());  
+      $('#total').html(summ_total());
 
-       $('#total').html(summ_total());
-
-       return false; 
+      return false; 
    }
    
    $.ajax({ url : 'converter.php',type : 'POST', data : 'from_valute=' + from + '&to=' + CURRENTCY + '&cost=' + val,success : function(resp){
   
      resp = JSON.parse(resp);
     
-     if( resp["result"] == true && resp["error"] == "") {
+     if(resp["result"] == true && resp["error"] == "") {
 
        $(elm).val( Number(resp["total"]).toFixed(2) );
 
@@ -303,17 +287,17 @@ global $USER;
        $('#total').html(summ_total());
 
      } else {
-        console.log( resp["error"]);
+       console.log( resp["error"]);
     }
 
   }}); 
  }
 
- function valute_convert(val,elm) {
+ function convert_paypal_price(val,elm) {
 
-   var basket = new Basket("sale");
+   var basket = new Basket("sale"),
 
-   var from =  basket.getPriceCode();
+       from =  basket.getPriceCode();
    
    $.ajax({ url : 'converter.php',type : 'POST', data : 'from_valute=' + from + '&to=' + BASE_CURRENTCY + '&cost=' + val,success : function(resp){
   
@@ -323,26 +307,23 @@ global $USER;
 
        $('#' + elm).val( Number(resp["total"]).toFixed(2) );
 
-       //console.log('RUB convert ' + elm +' ' + Number(resp["total"]).toFixed(2) ); 
-
      } else {
-        console.log( resp["error"]);
+       console.log( resp["error"]);
     }
 
   }}); 
 
-
-   return parseFloat( Number(val).toFixed(2));
+  return parseFloat( Number(val).toFixed(2));
 
  }
 
  function initCart() {
 
- var basket = new Basket("sale");
+ var basket = new Basket("sale"),
 
- var cart = basket.getCart();
+     cart = basket.getCart(),
 
- var items = basket.get(),
+     items = basket.get(),
 
      cart_list = $('#cart-list tr:first'),
      
@@ -359,23 +340,22 @@ global $USER;
 
      ship_codes = [];
 
-  for(var item in items)  {
+ for(var item in items)  {
      
-      var prod = (items[item]).split("||");
+     var prod = (items[item]).split("||"),
 
-      var ship_method = JSON.parse( prod[5] );
+         ship_method = JSON.parse(prod[5]),
 
-      var tmp_codes = [];
+         tmp_codes = [];
 
       for(var j in ship_method) {
 
          var code = (ship_method[j]).ship_code;
          
              tmp_codes.push(code);
-        
-     }
+      }
 
-     storage_buffer.push(tmp_codes);
+      storage_buffer.push(tmp_codes);
   }
 
   var reverse = [];
@@ -436,14 +416,11 @@ global $USER;
 
  }
 
- //console.log(  storage_buffer );
-
-
  for(var item in items)  {
      
-    var prod = (items[item]).split("||");
+    var prod = (items[item]).split("||"),
 
-    var item_c = Number(item) + 1;
+        item_c = Number(item) + 1;
 
     $(pay_form).append('<input type="hidden" name="item_name_' +  item_c + '" value="' + prod[0]+ '">'); 
 
@@ -451,7 +428,7 @@ global $USER;
 
     $(pay_form).append('<input type="hidden" class="item_sum" name="amount_' +  item_c + '" id="amount_' +  item_c  + '" value="' + prod[2] + '">'); 
 
-    valute_convert(prod[2],'amount_' +  item_c);
+    convert_paypal_price(prod[2],'amount_' +  item_c);
 
     $(pay_form).append('<input type="hidden" id="shipping_' + item_c + '" name="shipping_' + item_c  +'" class="ship_item" value="0.0">');
 
@@ -461,13 +438,13 @@ global $USER;
 
     $(cart_list).after('<tr><td class="cart-prod-img"><a href="' + prod[4] + '"  class="full-img"  rel="lightbox"><img src="' + prod[4] + '" alt=""></a><td><a class="title-prod" href="/detail.php?code='+ prod[3] + '">' + prod[0] + '</a><td class="cost_price" id="price_' + item_c + '"></td><td><div class="quanity-control"><span class="down"></span> <input type="number" size="2" id="cv_' + item_c + '" value="'+ prod[1] + '" min="1" max="10" class="value-quantity"><span class="up"></span></div><td><a href="javascript:void(0)" class="control-basket" title="remove"><img src="/images/delete.png" alt="Remove"></a>');
 
-    convert_price(prod[2],'price_' + item_c) ;
+    convert_basket_price(prod[2],'price_' + item_c) ;
 
     var ship_method = JSON.parse( prod[5] );
 
     var html_select = '<select class="shipping-data" id="ship_method_' + item_c  +'">';
 
-    var current_ship_method =  shipObjToArray(ship_method) ;
+    var current_ship_method = shipObjToArray(ship_method) ;
 
     var exists_ship_method; 
 
@@ -487,17 +464,16 @@ global $USER;
 
          if( $.inArray(ship_obj.ship_code,ship_codes) == -1 && exists_ship_code(ship_obj.ship_code,storage_buffer) ) {
       
-                ship_codes.push(ship_obj.ship_code);
+              ship_codes.push(ship_obj.ship_code);
          }
 
     } else {
-
 
        html_select+='<option value="' +  ship_obj.ship_price + '">' + ship_obj.ship_code;
 
        if( $.inArray(ship_obj.ship_code,ship_codes) == -1 && exists_ship_code(ship_obj.ship_code,storage_buffer) ) {
       
-                ship_codes.push(ship_obj.ship_code);
+            ship_codes.push(ship_obj.ship_code);
        }
    }
 
@@ -509,11 +485,9 @@ global $USER;
 
   } 
 
-  $('.full-img').slimbox();
-
   var html_radio = '',
 
-      ship_icons = '';
+      ship_icons = '',
 
       summ_ship =  '';
 
@@ -528,48 +502,39 @@ global $USER;
      summ_ship+=  '<td style="text-align:center !important;"><span id="' + ( String(ship_codes[k]).replace(/\s+/g,'_')  ) + '">0.0</span>';
   }
   
+  ship_icons+= '<tr><td width="220">Shipping price: <div id="price-ship-items">' + summ_ship + '</div>';
+  ship_icons+= '<tr><td width="220">Select shipping method: <div class="ship-comp">'+  html_radio +'</div>';
 
-  ship_icons+=  '<tr><td width="220">Shipping price: <div id="price-ship-items">' + summ_ship + '</div>';
-  
-  ship_icons+=  '<tr><td width="220">Select shipping method: <div class="ship-comp">'+  html_radio +'</div>';
-
-  $('#cart-list tr:last').after('<tr><td colspan="5" class="left-spacing-cell" id="ship-icon"><table width="600" id="table-ship"><tr><td width="220">Shipping companies: ' + ship_icons + ' </table><tr class="center-row"><td colspan="5" class="total-cell">Total  <span id="total"></span> ' + CURRENTCY );
+  $('#cart-list tr:last').after('<tr><td colspan="5" class="left-spacing-cell" id="ship-icon"><table width="600" id="table-ship"><tr><td width="220">Shipping companies: ' + 
+  ship_icons + ' </table><tr class="center-row"><td colspan="5" class="total-cell">Total  <span id="total"></span> ' + CURRENTCY + '<tr class="center-row"><td colspan="5"><button id="checkout">Checkout</button>');
 
   var shipping_data = $('.shipping-data');
 
+  $('.radio-ship').change(function(e) {
 
- $('.radio-ship').change(function(e) {
+  var current_select = $(e.target).val(),
 
-   var current_select = $(e.target).val();
+      ship_cost_id = current_select.replace(/\s+/g,'_'), 
 
-   var ship_cost_id = current_select.replace(/\s+/g,'_'); 
-
-   var shipping_user_valute = $('.ship_item_user_valute');
-
-   //console.log(shipping_user_valute); 
+      shipping_user_valute = $('.ship_item_user_valute');
 
    $(shipping_data).each(function(k,item) {
 
      var options = $(item).find("option");
 
-     $(options).attr("selected",false);
+         $(options).attr("selected",false);
 
-     $(options).each(function(i,elm) {
+         $(options).each(function(i,elm) {
 
-       if( String( $(elm).text() ) == current_select ) {
+         if( String( $(elm).text() ) == current_select ) {
 
-           $(elm).attr("selected","selected");
+             $(elm).attr("selected","selected");
 
-        var ship_cost = String( $(elm).val() ) ;    
+         var ship_cost = String( $(elm).val() ) ;    
 
-            //$('input[name="shipping_' + (k + 1) + '"]').val( ship_cost );
-        
-            convert_ship(ship_cost, shipping_user_valute[k], $('#' + ship_cost_id) ) ;
+             convert_ship(ship_cost,shipping_user_valute[k], $('#' + ship_cost_id) ) ;
 
-            valute_convert( ship_cost,'shipping_' + (k + 1) );
-           
-            //console.log( ship_cost_id );
-             
+             convert_paypal_price(ship_cost,'shipping_' + (k + 1) );
        } 
 
      });
@@ -579,13 +544,11 @@ global $USER;
    
        $('#total').html( summ );
 
-   
- });
+  });
  
- var summ =  summ_total();
+  var summ =  summ_total();
    
-
-     $('#total').html( summ );
+      $('#total').html( summ );
 }
 
 
@@ -608,7 +571,6 @@ global $USER;
   var summa = 0.0,
       counts = $('.value-quantity');
 
-  //.item_sum
   $('.cost_price').each(function(key,val) {
    
      summa+= parseFloat( Number( $(val).html() ).toFixed(2)) * $(counts[key]).val();
@@ -631,13 +593,13 @@ global $USER;
 
       quanity = $('.value-quantity');
 
-   $(pay_form).find("input").remove();
+      $(pay_form).find("input").remove();
  
-   for(var item in items)  {
+  for(var item in items)  {
      
-    var prod = (items[item]).split("||");
+    var prod = (items[item]).split("||"),
 
-    var item_c = Number(item) + 1;
+        item_c = Number(item) + 1;
 
     $(pay_form).append('<input type="hidden" name="item_name_' +  item_c + '" value="' + prod[0]+ '">'); 
 
@@ -645,31 +607,36 @@ global $USER;
 
     $(pay_form).append('<input type="hidden" class="item_sum" name="amount_' +  item_c + '" id="amount_' +  item_c  + '" value="' + prod[2] + '">'); 
 
-    valute_convert(prod[2],'amount_' +  item_c);
+    convert_paypal_price(prod[2],'amount_' +  item_c);
 
     $(pay_form).append('<input type="hidden" name="shipping_' + item_c  +'" class="ship_item" value="0.0">');
 
     $(pay_form).append('<input type="hidden" id="user_ship_' + item_c + '" class="ship_item_user_valute" value="0.0">');
 
-    $(pay_form).append('<input type="hidden" class="vq_' + item_c  + '" name="quantity_' +  item_c + '" value="' + prod[1] + '">'); 
+    $(pay_form).append('<input type="hidden" class="vq_' + item_c  + '" name="quantity_' +  item_c + '" value="' + $(quanity[item]).val() + '">'); 
 
     $(quanity[item]).attr("id","cv_" + item_c);
 
+   }
+
+   if(items.length == 0) {
+      $('#table-ship').parent().parent().remove();
    }
   
  }
 
  function updateTotal(val,opt) {
 
-
     $('#total').html(  summ_total() );    
-
  }
-
 
  initCart();
 
- $('.control-basket').click(function(e) {
+ $('#checkout').bind('click',function(e) {
+     $("html,body").animate({scrollTop : Number($('.tabs').offset().top) + "px"},300);
+ });
+
+ $('.control-basket').bind('click',function(e) {
 
    var prod_id = $(e.target).parent().parent().prev().prev().prev().first().text();
 
@@ -742,7 +709,7 @@ global $USER;
 
    $('.vq_' + input_id[1]).val( input_val );
     
-    updateTotal(val,'sub');
+      updateTotal(val,'sub');
 
    }
 
@@ -766,7 +733,6 @@ global $USER;
 
   return true;
  }
-
 
  function initFormValidate() {
 
@@ -814,13 +780,22 @@ global $USER;
 
  $('#order-send').click(function(e) {
 
-  // console.log($('.radio-ship').is(':checked') );
+   var basket = new Basket("sale"),
 
-   if( !$('.radio-ship').is(':checked')  ) {
+       items = basket.get();
 
-        alert('Select shipping method');
+   if(items.length == 0) {
 
-        return false;
+      alert('Shopping cart is empty');
+
+      return false;
+   }
+
+   if(!$('.radio-ship').is(':checked')) {
+
+      alert('Select shipping method');
+
+      return false;
    }
 
    return true;
@@ -842,8 +817,6 @@ global $USER;
     return true;
 
    });
-
 }
- //console.log( inputValidateSupport() );
 </script>
 <?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

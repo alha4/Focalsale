@@ -5,7 +5,7 @@ require($_SERVER["DOCUMENT_ROOT"]."/cart/PaypalIpn.php");
 
 if( isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 
-    $ipn = new PaypalIpn( PaypalIpn::SANDBOX );
+    $ipn = new PaypalIpn( PaypalIpn::LIVE );
 
     $ipn->createIpnListener();
     

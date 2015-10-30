@@ -20,7 +20,7 @@ class PaypalIpn {
 
     const SANDBOX = 'https://www.sandbox.paypal.com/cgi-bin/websc';
 
-    const BUSSINES_EMAIL = 'ivalderman345@mail.ru';
+    const BUSSINES_EMAIL = 'adexalltd@gmail.com'; //'ivalderman345@mail.ru';
 
     public function __construct($config_url) {
 
